@@ -1,0 +1,10 @@
+sed -i "s/fontSize: '6.5pt'/fontSize: '9pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '7pt'/fontSize: '9.5pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '7.2pt'/fontSize: '9.5pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '7.5pt'/fontSize: '10pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '7.8pt'/fontSize: '10pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '8pt'/fontSize: '10.5pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '8.2pt'/fontSize: '11pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '8.5pt'/fontSize: '11pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '9pt'/fontSize: '11.5pt'/g" src/components/PadPreview.tsx
+sed -i "s/fontSize: '10pt'/fontSize: '12pt'/g" src/components/PadPreview.tsx

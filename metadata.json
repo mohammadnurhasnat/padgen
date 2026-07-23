@@ -1,0 +1,6 @@
+{
+  "name": "Padgen",
+  "description": "An interactive visa and business cover letter generator with dynamic form controls, direct A4 live-draft editing, and custom-styled PDF exports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

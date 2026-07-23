@@ -1,0 +1,22 @@
+--- src/App.tsx
++++ src/App.tsx
+@@ -714,2 +714,14 @@
+ 
++  const handleDataChange = (newData: typeof companyData) => {
++    const industryChanged = newData.industry !== companyData.industry;
++    setCompanyData(newData);
++    
++    if (industryChanged) {
++      // Generate new theme based on industry, let's just trigger generateDesign
++      // or just handleGenerate(true)
++      // actually, just call random theme to give it a new vibe
++      handleRandomTheme();
++    }
++  };
++
+   return (
+@@ -723,3 +735,3 @@
+           companyData={companyData}
+-          onDataChange={setCompanyData}
++          onDataChange={handleDataChange}
+           controls={controls}

@@ -1,0 +1,36 @@
+--- src/data.ts
++++ src/data.ts
+@@ -282,3 +282,13 @@
+   'architectural-lines',
+-  'executive-signature',
+-  'minimalist-stamped'
++  'executive-signature',
++  'minimalist-stamped',
++  'freepik-corporate-blue',
++  'canva-creative-wave',
++  'modern-gradient-edge',
++  'luxury-gold-foil',
++  'startup-geometric',
++  'law-firm-classic',
++  'creative-agency-bold',
++  'medical-clean-cross',
++  'real-estate-arch',
++  'hospitality-elegant'
+@@ -308,3 +318,13 @@
+   'architectural-structure',
+-  'geometric-nodes',
+-  'vertical-editorial',
+-  'corporate-envelope'
++  'geometric-nodes',
++  'vertical-editorial',
++  'corporate-envelope',
++  'freepik-corporate-blue',
++  'canva-creative-wave',
++  'modern-gradient-edge',
++  'luxury-gold-foil',
++  'startup-geometric',
++  'law-firm-classic',
++  'creative-agency-bold',
++  'medical-clean-cross',
++  'real-estate-arch',
++  'hospitality-elegant'

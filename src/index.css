@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Crimson+Text:ital,wght@0,400;0,700;1,400&family=Fira+Sans:wght@400;700&family=Inconsolata:wght@400;700&family=Inter:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --ui-bg: #FAFAFA;
+  --ui-panel: #FFFFFF;
+  --ui-ink: #0F172A;
+  --ui-sub: #10B981;
+  --ui-line: #E2E8F0;
+  --ui-accent: #059669;
+  --ui-accent-hover: #047857;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --coral-accent: #059669;
+  --coral-light: #ECFDF5;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+  font-family: var(--sans);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Document Internal Core Styles */
+.pad {
+  width: 210mm;
+  height: 297mm;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.pad .wm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 78mm;
+  height: 78mm;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.pad .topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.2mm;
+  z-index: 2;
+}
+
+.pad .frame-line {
+  position: absolute;
+  top: 9mm;
+  left: 9mm;
+  right: 9mm;
+  bottom: 9mm;
+  border: 1px solid;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pad .content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  width: 89mm;
+  height: 51mm;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.card .content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.card .frame-line {
+  position: absolute;
+  top: 1.6mm;
+  left: 1.6mm;
+  right: 1.6mm;
+  bottom: 1.6mm;
+  border: 1px solid;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Hidden elements for print & snapshots */
+#printPad, #printCard, #printCardA4 {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+}
+
+/* Standard print media target styling to perfectly render PDF pages */
+@media print {
+  body > *:not(#printPad):not(#printCard) {
+    display: none !important;
+  }
+  #printPad, #printCard {
+    display: none !important;
+  }
+  body.printing-pad #printPad {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 9999999 !important;
+  }
+  body.printing-card #printCard {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 9999999 !important;
+  }
+}
+
+/* Premium Glossy Finish Styling */
+.card, .pad {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Glossy highlight effects */
+.glossy-sheen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.06) 28%,
+    rgba(255, 255, 255, 0) 28.1%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 30;
+}
+
+.glossy-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.04) 75%,
+    rgba(255, 255, 255, 0.12) 80%,
+    rgba(255, 255, 255, 0.04) 85%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+  z-index: 31;
+}
+
+.glossy-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+  z-index: 32;
+}
+
+/* HIGH GLOSS EMERALD BUTTON WITH GLINT EFFECT */
+.glossy-blue-button {
+  background: linear-gradient(180deg, #10b981 0%, #059669 45%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #34d399 !important;
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.45),
+    inset 0 -1.5px 3px rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(16, 185, 129, 0.3) !important;
+  text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.4) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+.glossy-blue-button::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -150% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 25%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    rgba(255, 255, 255, 0) 100%
+  ) !important;
+  transform: skewX(-25deg) !important;
+  transition: none !important;
+  pointer-events: none !important;
+}
+
+.glossy-blue-button:hover {
+  transform: translateY(-1.5px) scale(1.02) !important;
+  background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #059669 100%) !important;
+  box-shadow: 
+    inset 0 2px 3px rgba(255, 255, 255, 0.55),
+    inset 0 -1.5px 3px rgba(0, 0, 0, 0.25),
+    0 8px 18px rgba(16, 185, 129, 0.45) !important;
+  border-color: #6ee7b7 !important;
+}
+
+.glossy-blue-button:hover::before {
+  left: 150% !important;
+  transition: left 0.75s ease-in-out !important;
+}
+
+.glossy-blue-button:active {
+  transform: translateY(1px) scale(0.98) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(16, 185, 129, 0.15) !important;
+}
+
