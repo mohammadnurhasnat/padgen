@@ -19,21 +19,17 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
           </div>
           <div>
             <h1 className="text-base font-bold text-neutral-900 m-0 leading-none">
-              {activeTab === 'designer'
-                ? 'PadGen Studio'
-                : activeTab === 'cover-letter'
-                ? 'Cover Letter Generator'
-                : 'Job ID Card Generator'}
+              PadGen
             </h1>
           </div>
         </div>
 
         {/* TAB CONTROL TOGGLES */}
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <div className="inline-flex items-center p-1 rounded-full bg-neutral-100 border border-neutral-200 gap-1.5">
+          <div className="inline-flex items-center p-1 rounded-[10px] bg-neutral-100 border border-neutral-200 gap-1.5">
             <button
               onClick={() => onTabChange('designer')}
-              className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
+              className={`px-4 py-1.5 rounded-[10px] text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'designer'
                   ? 'bg-emerald-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-emerald-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
@@ -43,7 +39,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
             </button>
             <button
               onClick={() => onTabChange('cover-letter')}
-              className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
+              className={`px-4 py-1.5 rounded-[10px] text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'cover-letter'
                   ? 'bg-indigo-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-indigo-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
@@ -53,7 +49,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
             </button>
             <button
               onClick={() => onTabChange('id-card')}
-              className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
+              className={`px-4 py-1.5 rounded-[10px] text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'id-card'
                   ? 'bg-teal-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-teal-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'

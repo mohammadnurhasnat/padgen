@@ -31,17 +31,16 @@ const PadPreviewInner: React.FC<PadPreviewProps> = ({
 }) => {
   const initials = getInitials(data.companyName);
   
-  // Enforce sophisticated, classic, non-colorful tones
-  const isDarkTheme = theme.primary === '#0B192C'; // support tech-dark paper
-  const customPaper = isDarkTheme ? '#0F172A' : '#FCFCFC';
+  // Enforce clean classic light paper tones
+  const customPaper = '#FCFCFC';
   
   // Muted classic colors
-  const prim = isDarkTheme ? '#E2E8F0' : '#1E293B'; // Deep Slate or Off-white
-  const acc = '#C5A880'; // Classic Antique Gold
-  const sec = '#64748B'; // Muted Slate Grey
-  const detailsMuted = isDarkTheme ? '#94A3B8' : '#475569';
+  const prim = theme.primary || '#1E293B';
+  const acc = theme.accent || '#C5A880';
+  const sec = theme.secondary || '#64748B';
+  const detailsMuted = '#475569';
 
-  const mark = logoMarkSVG(initials, shape, prim, acc, isDarkTheme ? '#0F172A' : '#FFFFFF', logoStyle);
+  const mark = logoMarkSVG(initials, shape, prim, acc, '#FFFFFF', logoStyle);
 
   const waterMark = (
     <div
@@ -74,7 +73,7 @@ const PadPreviewInner: React.FC<PadPreviewProps> = ({
         />
       ) : (
         <div
-          style={{ width: '100%', height: '100%', filter: isDarkTheme ? 'invert(1)' : 'none' }}
+          style={{ width: '100%', height: '100%' }}
           dangerouslySetInnerHTML={{ __html: mark }}
         />
       )}
@@ -259,7 +258,7 @@ const PadPreviewInner: React.FC<PadPreviewProps> = ({
   // 5. Bespoke Luxury Centered
   if (layout === 'canva-organic-abstract') {
     return (
-      <div className="pad" style={{ background: isDarkTheme ? '#0F172A' : '#FAF8F5', fontFamily: "'Garamond', serif", border: `1px solid ${hexToRgba(prim, 0.08)}` }}>
+      <div className="pad" style={{ background: '#FAF8F5', fontFamily: "'Garamond', serif", border: `1px solid ${hexToRgba(prim, 0.08)}` }}>
         {gridStyle !== 'none' && <div style={backgroundGridStyles}></div>}
         {waterMark}
 

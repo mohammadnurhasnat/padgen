@@ -172,6 +172,16 @@ export default function App() {
       } else {
         setResolvedCardLayout(value);
       }
+    } else if (key === 'theme') {
+      if (value === 'random') {
+        const randomTheme = Math.floor(Math.random() * THEMES.length);
+        setThemeIdx(randomTheme);
+      } else {
+        const themeIndex = parseInt(value, 10);
+        if (!isNaN(themeIndex) && themeIndex >= 0 && themeIndex < THEMES.length) {
+          setThemeIdx(themeIndex);
+        }
+      }
     }
   };
 

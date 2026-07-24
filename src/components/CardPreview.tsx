@@ -900,26 +900,26 @@ const CardPreviewInner: React.FC<CardPreviewProps> = ({
   if (layout === 'luxury-gold-foil') {
     const goldLogo = uploadedLogo
       ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%"><image href="${uploadedLogo}" x="0" y="0" width="200" height="200" preserveAspectRatio="xMidYMid meet"/></svg>`
-      : logoMarkSVG(initials, shape, '#FFFFFF', '#FCF6BA', '#AA771C', logoStyle);
+      : logoMarkSVG(initials, shape, prim, '#AA771C', '#FFFFFF', logoStyle);
     return (
-      <div className="card" style={{ background: '#111111', color: '#F1E6C8', fontFamily: "'Georgia', serif", border: '1mm solid #AA771C', padding: '5mm', boxSizing: 'border-box', position: "relative" }}>
+      <div className="card" style={{ background: theme.paper, color: prim, fontFamily: "'Georgia', serif", border: '1mm solid #AA771C', padding: '5mm', boxSizing: 'border-box', position: "relative" }}>
          <div style={{ display: 'flex', justifyContent: 'space-between', height: '100%', alignItems: 'center' }}>
            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '60%', height: '100%' }}>
              <div>
-               <div style={{ fontSize: `${cardNameSize}pt`, fontWeight: 'bold', color: '#FCF6BA', lineHeight: 1.15 }}>{nameFormatted}</div>
+               <div style={{ fontSize: `${cardNameSize}pt`, fontWeight: 'bold', color: prim, lineHeight: 1.15 }}>{nameFormatted}</div>
                <div style={{ fontSize: '6pt', color: '#BF953F', fontStyle: 'italic', marginTop: '0.5mm' }}>{data.tagline}</div>
              </div>
              <div>
-               <div style={{ fontSize: '9pt', fontWeight: 'bold', color: '#FFFFFF' }}>{data.empName}</div>
+               <div style={{ fontSize: '9pt', fontWeight: 'bold', color: prim }}>{data.empName}</div>
                <div style={{ fontSize: '6pt', color: '#BF953F', letterSpacing: '1px', textTransform: 'uppercase' }}>{roleLine}</div>
              </div>
-             <div style={{ fontSize: '5.5pt', color: '#B38728', lineHeight: 1.3, borderTop: '0.5px solid rgba(179,135,40,0.3)', paddingTop: '1mm' }}>
+             <div style={{ fontSize: '5.5pt', color: detailsMuted, lineHeight: 1.3, borderTop: '0.5px solid rgba(179,135,40,0.3)', paddingTop: '1mm' }}>
                <div>📞 {mobileNumber} &bull; ✉️ {data.email}</div>
                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📍 {data.address}</div>
              </div>
            </div>
            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '35%' }}>
-              <div style={{ width: '16mm', height: '16mm', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} dangerouslySetInnerHTML={{ __html: goldLogo }} />
+              <div style={{ width: '16mm', height: '16mm' }} dangerouslySetInnerHTML={{ __html: goldLogo }} />
            </div>
          </div>
       </div>
@@ -980,21 +980,21 @@ const CardPreviewInner: React.FC<CardPreviewProps> = ({
   // 27. Creative Agency Bold
   if (layout === 'creative-agency-bold') {
     return (
-      <div className="card" style={{ background: prim, color: '#fff', fontFamily: "'Arial Black', sans-serif" , position: "relative"}}>
+      <div className="card" style={{ background: theme.paper, color: prim, fontFamily: "'Arial Black', sans-serif", border: `1.5px solid ${prim}`, position: "relative" }}>
          <div style={{ padding: '6mm 8mm', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-             <div style={{ fontSize: `${cardNameSize + 2}pt`, lineHeight: 1.1, letterSpacing: '-1px', maxWidth: '75%' }}>{nameFormatted.toUpperCase()}</div>
-             <div style={{ width: '13mm', height: '13mm' }} dangerouslySetInnerHTML={{ __html: whiteLogoMark }} />
+             <div style={{ fontSize: `${cardNameSize + 2}pt`, lineHeight: 1.1, letterSpacing: '-1px', maxWidth: '75%', color: prim }}>{nameFormatted.toUpperCase()}</div>
+             <div style={{ width: '13mm', height: '13mm' }} dangerouslySetInnerHTML={{ __html: mark }} />
            </div>
            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-             <div style={{ fontSize: '5.5pt', opacity: 0.8, lineHeight: 1.3, fontFamily: "sans-serif" }}>
+             <div style={{ fontSize: '5.5pt', opacity: 0.8, lineHeight: 1.3, fontFamily: "sans-serif", color: detailsMuted }}>
                <div>📍 {data.address}</div>
                <div>✉️ {data.email}</div>
              </div>
              <div style={{ textAlign: 'right' }}>
                <div style={{ fontSize: '9pt', color: acc }}>{data.empName}</div>
-               <div style={{ fontSize: '6.5pt', opacity: 0.9, fontFamily: 'sans-serif' }}>{roleLine}</div>
-               <div style={{ fontSize: '6pt', opacity: 0.8, marginTop: '1px', fontFamily: 'sans-serif' }}>📞 {mobileNumber}</div>
+               <div style={{ fontSize: '6.5pt', opacity: 0.9, fontFamily: 'sans-serif', color: detailsMuted }}>{roleLine}</div>
+               <div style={{ fontSize: '6pt', opacity: 0.8, marginTop: '1px', fontFamily: 'sans-serif', color: detailsMuted }}>📞 {mobileNumber}</div>
              </div>
            </div>
          </div>

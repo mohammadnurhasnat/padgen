@@ -26,7 +26,7 @@ interface PreviewStageProps {
   uploadedLogo?: string;
   uploadedLogoSize?: number;
   uploadedLogoOpacity?: number;
-  onUpdateStyle?: (key: 'font' | 'shape' | 'gridStyle' | 'texture' | 'cardLayout', value: string) => void;
+  onUpdateStyle?: (key: 'font' | 'shape' | 'gridStyle' | 'texture' | 'cardLayout' | 'theme', value: string) => void;
   onBack?: () => void;
   onRedesign?: () => void;
   onDownloadPadPDF?: () => void;
@@ -130,7 +130,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
           >
             <Shuffle className="w-3 h-3 text-amber-100" />
-            <span>Random Font</span>
+            <span>Font</span>
           </button>
 
           <button
@@ -139,7 +139,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
           >
             <Shuffle className="w-3 h-3 text-indigo-100" />
-            <span>Random Shape</span>
+            <span>Logo</span>
           </button>
 
           <button
@@ -148,7 +148,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className="bg-violet-600 hover:bg-violet-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
           >
             <Shuffle className="w-3 h-3 text-violet-100" />
-            <span>Random Grid/Lines</span>
+            <span>Grid/Lines</span>
           </button>
 
           <button
@@ -157,7 +157,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
           >
             <Shuffle className="w-3 h-3 text-rose-100" />
-            <span>Random Texture</span>
+            <span>Texture</span>
           </button>
 
           <button
@@ -166,7 +166,16 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
             className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
           >
             <Shuffle className="w-3 h-3 text-cyan-100" />
-            <span>Random Card Format</span>
+            <span>Card Format</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('theme', 'random')}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-blue-100" />
+            <span>Theme</span>
           </button>
         </div>
 

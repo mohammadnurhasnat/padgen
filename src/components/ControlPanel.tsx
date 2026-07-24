@@ -52,8 +52,8 @@ interface ControlPanelProps {
   onDataChange: (data: CompanyData) => void;
   onControlsChange: (controls: DesignControls) => void;
   onGenerate: () => void;
-  onRandomTheme: () => void;
-  onResetAll: () => void;
+  onRandomTheme?: () => void;
+  onResetAll?: () => void;
   onDownloadPadPDF: () => void;
   onDownloadCardPDF: () => void;
   onExportCardSVG: () => void;
@@ -393,21 +393,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <Sparkles className="w-5 h-5" />
             Generate Design
           </button>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={onRandomTheme}
-              className="bg-indigo-600 hover:bg-indigo-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold py-2.5 px-3 rounded-lg text-[13px] active:translate-y-[2px]  transition-all cursor-pointer"
-            >
-              Random Theme
-            </button>
-            <button
-              onClick={onResetAll}
-              className="bg-rose-600 hover:bg-rose-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold py-2.5 px-3 rounded-lg text-[13px] active:translate-y-[2px]  transition-all cursor-pointer"
-            >
-              Reset Inputs
-            </button>
-          </div>
         </div>
       </div>
 
