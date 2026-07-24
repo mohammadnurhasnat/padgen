@@ -155,16 +155,17 @@ export function generateNOCPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
   doc.setTextColor(primaryColor);
-  doc.text(fields.companyName.toUpperCase() || 'ACME CORPORATION', 20, 25);
+  doc.text(fields.companyName.toUpperCase() || 'ACME CORPORATION', 105, 25, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(100, 116, 139);
-  doc.text(fields.companyAddress || '123 Business Avenue, Suite 400', 20, 31);
+  doc.text(fields.companyAddress || '123 Business Avenue, Suite 400', 105, 31, { align: 'center' });
   doc.text(
     `Tel: ${fields.companyPhone || '+1 (555) 000-0000'}  |  Email: ${fields.companyEmail || 'info@company.com'}`,
-    20,
-    36
+    105,
+    36,
+    { align: 'center' }
   );
 
   // Horizontal divider
@@ -218,11 +219,6 @@ export function generateNOCPDF(
   // 6. Footer Decorative Bar
   doc.setFillColor(primaryColor);
   doc.rect(0, 287, 210, 10, 'F');
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
-  doc.text('This is an official document issued by ' + (fields.companyName || 'Company'), 105, 293, { align: 'center' });
 
   // Save PDF
   const filename = `${fields.applicantName.toLowerCase().replace(/\s+/g, '_')}_noc_certificate.pdf`;

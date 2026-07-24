@@ -434,7 +434,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             />
 
             {/* Official Company Pad Letterhead Header */}
-            <div className="border-b-2 border-neutral-200 pb-5 mb-6 pt-3 select-none">
+            <div className="border-b-2 border-neutral-200 pb-5 mb-6 pt-3 select-none text-center">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 font-sans uppercase m-0 leading-tight">
                 {nocFields.companyName || 'ACME CORPORATION'}
               </h1>
@@ -476,11 +476,9 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
 
             {/* Bottom Company Pad Footer */}
             <div
-              className="mt-8 pt-3 pb-2 text-center text-xs text-white font-sans font-medium rounded-b-lg -mx-8 -mb-8 sm:-mx-12 sm:-mb-12"
+              className="mt-8 h-3 rounded-b-lg -mx-8 -mb-8 sm:-mx-12 sm:-mb-12"
               style={{ backgroundColor: theme?.primary || '#1E293B' }}
-            >
-              This is an official document issued on the company pad by {nocFields.companyName || 'Company'}.
-            </div>
+            />
           </div>
         </div>
       </div>
