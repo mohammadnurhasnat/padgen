@@ -136,19 +136,19 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                           <div className="flex gap-2">
                             <button
                               onClick={() => onLoadItem(item)}
-                              className="flex-1 bg-emerald-600 hover:bg-emerald-500 border-b-4 border-emerald-900 shadow-md text-white font-bold py-1.5 rounded-lg text-[11px] active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer"
+                              className="flex-1 bg-emerald-600 hover:bg-emerald-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold py-1.5 rounded-lg text-[11px]   transition-all cursor-pointer"
                             >
                               Load State
                             </button>
                             <button
                               onClick={() => onDownloadItemAgain(item)}
-                              className="flex-1 bg-indigo-600 hover:bg-indigo-500 border-b-4 border-indigo-900 shadow-md text-white font-bold py-1.5 rounded-lg text-[11px] active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer"
+                              className="flex-1 bg-indigo-600 hover:bg-indigo-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold py-1.5 rounded-lg text-[11px]   transition-all cursor-pointer"
                             >
                               Download
                             </button>
                             <button
                               onClick={() => onDeleteItem(item.id)}
-                              className="bg-rose-600 hover:bg-rose-500 border-b-4 border-rose-900 shadow-md text-white font-bold px-3 py-1.5 rounded-lg text-[11px] cursor-pointer active:translate-y-[2px] active:border-b-2 transition-all"
+                              className="bg-rose-600 hover:bg-rose-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-[11px] cursor-pointer   transition-all"
                               title="Delete Item"
                             >
                               Delete
@@ -166,7 +166,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
               <div className="p-4 bg-[#FBFBFA] border-t border-[#DDDEDC] flex justify-center">
                 <button
                   onClick={onClearHistory}
-                  className="bg-rose-600 hover:bg-rose-500 border-b-4 border-rose-900 shadow-md text-white font-bold px-4 py-2 rounded-lg text-[11px] active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer"
+                  className="bg-rose-600 hover:bg-rose-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-2 rounded-lg text-[11px]   transition-all cursor-pointer"
                 >
                   Clear Entire History
                 </button>

@@ -1,24 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ArrowLeft, Sparkles, RefreshCw, Download, FileText, CreditCard } from 'lucide-react';
+import { ArrowLeft, Sparkles, RefreshCw, Download, FileText, CreditCard, Shuffle } from 'lucide-react';
 import { PadPreview } from './PadPreview';
 import { CardPreview } from './CardPreview';
 import { CompanyData, Theme } from '../types';
+import { 
+  HEADLINE_FONTS, 
+  SHAPES, 
+  GRID_STYLES, GRID_STYLE_LABELS,
+  TEXTURES, TEXTURE_LABELS,
+  CARD_LAYOUTS, CARD_LAYOUT_LABELS
+} from '../data';
 
 interface PreviewStageProps {
   companyData: CompanyData;
   theme: Theme;
-  shape: 'circle' | 'square' | 'hexagon' | 'diamond' | 'shield' | 'octagon' | 'star' | 'rhombus' | 'cross' | 'ellipse' | 'badge-ribbon' | 'waves' | 'emblem-shield';
-  padLayout: any;
-  cardLayout: any;
+  shape: string;
+  padLayout: string;
+  cardLayout: string;
   headlineFont: string;
-  logoStyle: 'classic' | 'typographic' | 'bordered' | 'shadow-badge';
-  gridStyle: 'none' | 'dots' | 'lines';
-  texture: 'none' | 'linen' | 'vellum' | 'canvas';
+  logoStyle: string;
+  gridStyle: string;
+  texture: string;
   previewPadRef: React.RefObject<HTMLDivElement | null>;
   previewCardRef: React.RefObject<HTMLDivElement | null>;
   uploadedLogo?: string;
   uploadedLogoSize?: number;
   uploadedLogoOpacity?: number;
+  onUpdateStyle?: (key: 'font' | 'shape' | 'gridStyle' | 'texture' | 'cardLayout', value: string) => void;
   onBack?: () => void;
   onRedesign?: () => void;
   onDownloadPadPDF?: () => void;
@@ -42,6 +50,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
   uploadedLogo,
   uploadedLogoSize,
   uploadedLogoOpacity,
+  onUpdateStyle,
   onBack,
   onRedesign,
   onDownloadPadPDF,
@@ -89,15 +98,15 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
-      {/* PREVIEW TOP CONTROL BAR (Back, Re-design, Downloads) */}
-      <div className="w-full bg-white border-b border-neutral-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs shrink-0 z-30">
-        <div className="flex items-center gap-3">
+      {/* SINGLE COMPACT TOP CONTROL BAR */}
+      <div className="w-full bg-white border-b border-neutral-200 px-3 py-2 flex flex-wrap items-center justify-between gap-2 shadow-xs shrink-0 z-30">
+        <div className="flex flex-wrap items-center gap-1.5">
           {onBack && (
             <button
               onClick={onBack}
-              className="bg-neutral-800 hover:bg-neutral-900 text-white font-bold px-3.5 py-2 rounded-xl text-xs cursor-pointer shadow-sm transition-all flex items-center gap-1.5 active:scale-[0.98]"
+              className="bg-neutral-800 hover:bg-neutral-900 text-white font-bold px-2.5 py-1.5 rounded-md text-[11px] cursor-pointer border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs transition-all flex items-center gap-1"
             >
-              <ArrowLeft className="w-4 h-4 text-emerald-400" />
+              <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
               <span>Back to Edit</span>
             </button>
           )}
@@ -105,49 +114,97 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
           {onRedesign && (
             <button
               onClick={onRedesign}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer shadow-md transition-all flex items-center gap-2 active:scale-[0.98]"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-md text-[11px] cursor-pointer border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs transition-all flex items-center gap-1"
             >
-              <RefreshCw className="w-4 h-4 text-emerald-100 animate-spin-slow" />
+              <RefreshCw className="w-3.5 h-3.5 text-emerald-100 animate-spin-slow" />
               <span>Re-design</span>
             </button>
           )}
+
+          <div className="h-4 w-[1px] bg-neutral-300 mx-0.5 hidden sm:block" />
+
+          {/* Random Live Customization Buttons */}
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('font', 'random')}
+            className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-amber-100" />
+            <span>Random Font</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('shape', 'random')}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-indigo-100" />
+            <span>Random Shape</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('gridStyle', 'random')}
+            className="bg-violet-600 hover:bg-violet-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-violet-100" />
+            <span>Random Grid/Lines</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('texture', 'random')}
+            className="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-rose-100" />
+            <span>Random Texture</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onUpdateStyle && onUpdateStyle('cardLayout', 'random')}
+            className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
+          >
+            <Shuffle className="w-3 h-3 text-cyan-100" />
+            <span>Random Card Format</span>
+          </button>
         </div>
 
         {/* Download Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           {onDownloadPadPDF && (
             <button
               onClick={onDownloadPadPDF}
-              className="bg-teal-600 hover:bg-teal-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
+              className="bg-teal-600 hover:bg-teal-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3 h-3" />
               <span>Pad PDF</span>
             </button>
           )}
           {onDownloadCardPDF && (
             <button
               onClick={onDownloadCardPDF}
-              className="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
+              className="bg-sky-600 hover:bg-sky-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3 h-3" />
               <span>Card PDF</span>
             </button>
           )}
           {onDownloadPadPNG && (
             <button
               onClick={onDownloadPadPNG}
-              className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
+              className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3 h-3" />
               <span>Pad PNG</span>
             </button>
           )}
           {onDownloadCardPNG && (
             <button
               onClick={onDownloadCardPNG}
-              className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
+              className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3 h-3" />
               <span>Card PNG</span>
             </button>
           )}

@@ -119,8 +119,8 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
               onClick={() => setCoverMode('preview')}
               className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                 coverMode === 'preview'
-                  ? 'bg-teal-600 text-white border-b-2 border-teal-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-teal-600 text-white border-b-[3px] border-black/30 shadow-md ring-2 ring-teal-400 ring-offset-1'
+                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
               }`}
             >
               Preview Mode
@@ -129,8 +129,8 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
               onClick={() => setCoverMode('edit')}
               className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                 coverMode === 'edit'
-                  ? 'bg-sky-600 text-white border-b-2 border-sky-900 shadow-sm'
-                  : 'text-neutral-600 hover:text-neutral-900'
+                  ? 'bg-sky-600 text-white border-b-[3px] border-black/30 shadow-md ring-2 ring-sky-400 ring-offset-1'
+                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
               }`}
             >
               Edit Mode
@@ -142,14 +142,14 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
           {/* Quick-copy and reset templates */}
           <button
             onClick={handleCopyLetterText}
-            className="bg-indigo-600 hover:bg-indigo-500 border-b-4 border-indigo-900 shadow-md text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer active:translate-y-[2px] active:border-b-2 transition-all"
+            className="bg-indigo-600 hover:bg-indigo-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
           >
             {copied ? 'Copied!' : 'Copy Text'}
           </button>
 
           <button
             onClick={handleResetLetter}
-            className="bg-rose-600 hover:bg-rose-500 border-b-4 border-rose-900 shadow-md text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer active:translate-y-[2px] active:border-b-2 transition-all"
+            className="bg-rose-600 hover:bg-rose-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
             title="Reset back to generated template body"
           >
             Reset
@@ -163,14 +163,14 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                 alert('Printing blocked in preview. Please open in a new tab.');
               }
             }}
-            className="bg-purple-600 hover:bg-purple-500 border-b-4 border-purple-900 shadow-md text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer active:translate-y-[2px] active:border-b-2 transition-all"
+            className="bg-purple-600 hover:bg-purple-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
           >
             Print
           </button>
 
           <button
             onClick={handleDownloadPDF}
-            className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-emerald-900 shadow-md text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer active:translate-y-[2px] active:border-b-2 transition-all"
+            className="bg-emerald-600 hover:bg-emerald-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
           >
             Download PDF
           </button>

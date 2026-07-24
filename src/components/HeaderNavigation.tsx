@@ -23,7 +23,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                 ? 'PadGen Studio'
                 : activeTab === 'cover-letter'
                 ? 'Cover Letter Generator'
-                : 'Office ID Card Generator'}
+                : 'Job ID Card Generator'}
             </h1>
           </div>
         </div>
@@ -35,7 +35,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
               onClick={() => onTabChange('designer')}
               className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'designer'
-                  ? 'bg-emerald-600 text-white border-b-2 border-emerald-900 shadow-md font-bold'
+                  ? 'bg-emerald-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-emerald-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
               }`}
             >
@@ -45,7 +45,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
               onClick={() => onTabChange('cover-letter')}
               className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'cover-letter'
-                  ? 'bg-indigo-600 text-white border-b-2 border-indigo-900 shadow-md font-bold'
+                  ? 'bg-indigo-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-indigo-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
               }`}
             >
@@ -55,11 +55,11 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
               onClick={() => onTabChange('id-card')}
               className={`px-4 py-1.5 rounded-full text-xs transition-all duration-150 cursor-pointer ${
                 activeTab === 'id-card'
-                  ? 'bg-teal-600 text-white border-b-2 border-teal-900 shadow-md font-bold'
+                  ? 'bg-teal-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-teal-400 ring-offset-1'
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
               }`}
             >
-              Office ID Card
+              Job ID Card
             </button>
           </div>
         </div>

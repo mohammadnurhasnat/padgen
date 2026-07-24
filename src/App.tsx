@@ -21,7 +21,7 @@ import {
 import { ControlPanel } from './components/ControlPanel';
 import { PreviewStage } from './components/PreviewStage';
 import { HistoryPanel } from './components/HistoryPanel';
-import { OfficeIDCard } from './components/OfficeIDCard';
+import { JobIDCard } from './components/JobIDCard';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { CoverLetterGenerator } from './components/CoverLetterGenerator';
 import { svgWrap, downloadBlob } from './utils';
@@ -139,6 +139,40 @@ export default function App() {
     setDesignerStep('preview');
     setStatus('Generated a beautiful new layout!');
     setTimeout(() => setStatus(null), 3000);
+  };
+
+  const handleUpdateStyle = (key: string, value: string) => {
+    if (key === 'font') {
+      if (value === 'random') {
+        setResolvedFontIdx(Math.floor(Math.random() * HEADLINE_FONTS.length));
+      } else {
+        setResolvedFontIdx(parseInt(value, 10));
+      }
+    } else if (key === 'shape') {
+      if (value === 'random') {
+        setResolvedShape(SHAPES[Math.floor(Math.random() * SHAPES.length)]);
+      } else {
+        setResolvedShape(value);
+      }
+    } else if (key === 'gridStyle') {
+      if (value === 'random') {
+        setResolvedGridStyle(GRID_STYLES[Math.floor(Math.random() * GRID_STYLES.length)]);
+      } else {
+        setResolvedGridStyle(value);
+      }
+    } else if (key === 'texture') {
+      if (value === 'random') {
+        setResolvedTexture(TEXTURES[Math.floor(Math.random() * TEXTURES.length)]);
+      } else {
+        setResolvedTexture(value);
+      }
+    } else if (key === 'cardLayout') {
+      if (value === 'random') {
+        setResolvedCardLayout(CARD_LAYOUTS[Math.floor(Math.random() * CARD_LAYOUTS.length)]);
+      } else {
+        setResolvedCardLayout(value);
+      }
+    }
   };
 
   const handleRandomTheme = () => {
@@ -416,7 +450,7 @@ export default function App() {
               transition={{ duration: 0.15 }}
               className="flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden"
             >
-              {designerStep === 'form' && (
+              {designerStep === 'form' ? (
                 <ControlPanel
                   companyData={companyData}
                   onDataChange={setCompanyData}
@@ -446,30 +480,31 @@ export default function App() {
                   uploadedLogoOpacity={uploadedLogoOpacity}
                   onUploadedLogoOpacityChange={setUploadedLogoOpacity}
                 />
+              ) : (
+                <PreviewStage
+                  companyData={companyData}
+                  theme={THEMES[themeIdx]}
+                  shape={resolvedShape}
+                  padLayout={resolvedPadLayout}
+                  cardLayout={resolvedCardLayout}
+                  headlineFont={HEADLINE_FONTS[resolvedFontIdx].stack}
+                  logoStyle={resolvedLogoStyle}
+                  gridStyle={resolvedGridStyle}
+                  texture={resolvedTexture}
+                  previewPadRef={previewPadRef}
+                  previewCardRef={previewCardRef}
+                  uploadedLogo={uploadedLogo}
+                  uploadedLogoSize={uploadedLogoSize}
+                  uploadedLogoOpacity={uploadedLogoOpacity}
+                  onUpdateStyle={handleUpdateStyle}
+                  onBack={() => setDesignerStep('form')}
+                  onRedesign={handleGenerateDesigner}
+                  onDownloadPadPDF={handleDownloadPadPDF}
+                  onDownloadCardPDF={handleDownloadCardPDF}
+                  onDownloadPadPNG={handleDownloadPadPNG}
+                  onDownloadCardPNG={handleDownloadCardPNG}
+                />
               )}
-
-              <PreviewStage
-                companyData={companyData}
-                theme={THEMES[themeIdx]}
-                shape={resolvedShape}
-                padLayout={resolvedPadLayout}
-                cardLayout={resolvedCardLayout}
-                headlineFont={HEADLINE_FONTS[resolvedFontIdx].stack}
-                logoStyle={resolvedLogoStyle}
-                gridStyle={resolvedGridStyle}
-                texture={resolvedTexture}
-                previewPadRef={previewPadRef}
-                previewCardRef={previewCardRef}
-                uploadedLogo={uploadedLogo}
-                uploadedLogoSize={uploadedLogoSize}
-                uploadedLogoOpacity={uploadedLogoOpacity}
-                onBack={designerStep === 'preview' ? () => setDesignerStep('form') : undefined}
-                onRedesign={handleGenerateDesigner}
-                onDownloadPadPDF={handleDownloadPadPDF}
-                onDownloadCardPDF={handleDownloadCardPDF}
-                onDownloadPadPNG={handleDownloadPadPNG}
-                onDownloadCardPNG={handleDownloadCardPNG}
-              />
 
               <HistoryPanel
                 isOpen={isHistoryOpen}
@@ -492,7 +527,7 @@ export default function App() {
             />
           )}
 
-          {/* TAB 3: OFFICE ID CARD GENERATOR */}
+          {/* TAB 3: Job ID Card Generator */}
           {activeTab === 'id-card' && (
             <motion.div
               key="id-card-view"
@@ -501,7 +536,7 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.15 }}
             >
-              <OfficeIDCard
+              <JobIDCard
                 companyData={companyData}
                 onDataChange={setCompanyData}
                 uploadedLogo={uploadedLogo}
