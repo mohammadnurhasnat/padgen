@@ -196,49 +196,8 @@ export function generateCoverLetterPDF(coverFields: CoverLetterFields, companyDa
   const marginX = 20;
   const contentWidth = pageWidth - (marginX * 2);
   
-  const lineY = 53;
-  const startY = 65; 
+  const startY = 25; 
   const endY = 280; 
-
-  const drawDecorations = (pdfDoc: jsPDF) => {
-    // Top Bar #0C8493
-    pdfDoc.setFillColor(12, 132, 147);
-    pdfDoc.rect(0, 0, pageWidth, 4.5, 'F');
-
-    // Bottom Bar #FF8006
-    pdfDoc.setFillColor(255, 128, 6);
-    pdfDoc.rect(0, pageHeight - 4.5, pageWidth, 4.5, 'F');
-  };
-
-  const drawHeaderContent = (pdfDoc: jsPDF) => {
-    pdfDoc.setFont('times', 'bold');
-    pdfDoc.setFontSize(26);
-    pdfDoc.setTextColor(30, 41, 59);
-    
-    const compName = coverFields.companyName.toUpperCase();
-    pdfDoc.text(compName, pageWidth / 2, 18, { align: 'center' });
-
-    pdfDoc.setFont('times', 'normal');
-    pdfDoc.setFontSize(12.5);
-    pdfDoc.setTextColor(71, 85, 105);
-
-    const addrText = `${coverFields.referenceAddress}.`;
-    pdfDoc.text(addrText, pageWidth / 2, 26, { align: 'center', maxWidth: 170 });
-
-    const phoneStr = companyData.phone || '01712345678';
-    pdfDoc.text(`Mobile: ${phoneStr}`, pageWidth / 2, 33, { align: 'center' });
-
-    const emailText = `Email: ${companyData.email || `info@${coverFields.companyName.toLowerCase().replace(/\s+/g, '')}.com`}`;
-    pdfDoc.text(emailText, pageWidth / 2, 40, { align: 'center' });
-
-    // Horizontal separator line under address block at exactly 53mm
-    pdfDoc.setDrawColor(12, 132, 147);
-    pdfDoc.setLineWidth(0.5);
-    pdfDoc.line(0, lineY, pageWidth, lineY);
-  };
-
-  drawDecorations(doc);
-  drawHeaderContent(doc);
 
   doc.setFont('times', 'normal');
   doc.setFontSize(11.5);
@@ -276,7 +235,6 @@ export function generateCoverLetterPDF(coverFields: CoverLetterFields, companyDa
 
       if (currentY + leading > endY) {
         doc.addPage();
-        drawDecorations(doc);
         currentY = 25;
       }
 

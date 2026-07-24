@@ -130,7 +130,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
   const secondaryColor = theme.secondary || '#0F766E';
 
   return (
-    <div className="w-full flex flex-col gap-6 py-4 px-2 sm:px-6 max-w-6xl mx-auto min-h-screen">
+    <div className="w-full flex flex-col gap-6 py-4 px-2 sm:px-6 max-w-7xl mx-auto min-h-screen">
       {step === 'form' ? (
         <div className="bg-white rounded-2xl p-5 border border-neutral-200 shadow-sm flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-100 pb-4">

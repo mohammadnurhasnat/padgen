@@ -408,58 +408,19 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
             )}
           </div>
 
-          {/* High Fidelity A4 visual sheet */}
-          <div className="w-full max-w-2xl bg-white shadow-xl relative rounded-lg border border-neutral-200 overflow-hidden aspect-[210/297] flex flex-col justify-between print:shadow-none print:border-none print:p-0">
-            {/* Header: exactly 53mm tall */}
-            <div className="relative w-full h-[53mm] flex flex-col justify-center items-center px-8 pt-6 pb-2 box-border select-none bg-white">
-              {/* Top colored bar dynamically themed */}
-              <div
-                className="absolute top-0 left-0 right-0 h-[4.5mm]"
-                style={{ backgroundColor: primaryColor }}
-              />
-
-              {/* Company Name: bold, center, capitalized, enlarged */}
-              <h2 className="font-serif font-bold text-slate-800 tracking-wider text-xl sm:text-2xl text-center uppercase leading-tight mb-2">
-                {coverFields.companyName.toUpperCase()}
-              </h2>
-
-              {/* Address followed by a period */}
-              <p className="font-serif text-slate-600 text-xs sm:text-sm text-center font-medium leading-relaxed max-w-md mb-0.5">
-                {coverFields.referenceAddress}.
-              </p>
-
-              {/* Mobile */}
-              <p className="font-serif text-slate-600 text-xs sm:text-sm text-center font-medium leading-normal">
-                Mobile: {companyData.phone || '01712345678'}
-              </p>
-
-              {/* Email */}
-              <p className="font-serif text-slate-600 text-xs sm:text-sm text-center font-medium leading-normal">
-                Email:{' '}
-                {companyData.email ||
-                  `info@${(coverFields.companyName || 'company')
-                    .toLowerCase()
-                    .replace(/\s+/g, '')}.com`}
-              </p>
-
-              {/* Horizontal Line at 53mm */}
-              <div
-                className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                style={{ backgroundColor: primaryColor }}
-              />
-            </div>
-
-            {/* Letter Body Typing Container */}
-            <div className="flex-grow px-10 py-6 box-border bg-white select-text overflow-hidden">
+          {/* High Fidelity Plain White A4 Paper sheet */}
+          <div className="w-full max-w-2xl bg-white shadow-xl relative rounded-sm border border-neutral-200 overflow-hidden aspect-[210/297] flex flex-col p-6 sm:p-10 print:shadow-none print:border-none print:p-0 box-border">
+            {/* Letter Body Typing Container on pure white A4 paper */}
+            <div className="flex-grow w-full h-full bg-white select-text overflow-hidden">
               {coverMode === 'edit' ? (
                 <textarea
                   value={letterBody}
                   onChange={(e) => handleLetterBodyChange(e.target.value)}
-                  className="w-full h-full border-0 focus:ring-0 p-0 m-0 resize-none font-serif text-slate-900 text-sm leading-relaxed bg-transparent focus:outline-none placeholder-slate-400"
+                  className="w-full h-full border-0 focus:ring-0 p-0 m-0 resize-none font-serif text-slate-900 text-sm sm:text-base leading-relaxed bg-transparent focus:outline-none placeholder-slate-400"
                   placeholder="Type or modify your visa cover letter content here..."
                 />
               ) : (
-                <div className="w-full h-full font-serif text-slate-900 text-sm leading-relaxed whitespace-pre-wrap overflow-y-auto pr-2 break-words">
+                <div className="w-full h-full font-serif text-slate-900 text-sm sm:text-base leading-relaxed whitespace-pre-wrap overflow-y-auto pr-2 break-words">
                   {letterBody.split('\n').map((para, idx) => {
                     const trimmed = para.trim();
                     const isBold =
@@ -481,62 +442,31 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Decorative Footer Zone */}
-            <div className="relative w-full h-[6mm] bg-white select-none">
-              <div className="absolute bottom-0 left-0 right-0 h-[4.5mm] bg-[#FF8006]" />
-            </div>
           </div>
         </div>
       </div>
 
-      {/* HIDDEN PRINT TEMPLATE */}
+      {/* HIDDEN PRINT TEMPLATE FOR CLEAN WHITE A4 PAPER */}
       <div className="hidden print:block w-full h-full bg-white font-serif p-0 m-0">
-        <div className="relative w-full aspect-[210/297] flex flex-col justify-between">
-          <div className="absolute top-0 left-0 right-0 h-[4.5mm] bg-[#0C8493]" />
+        <div className="relative w-full aspect-[210/297] flex flex-col p-12 box-border bg-white text-slate-900 text-base leading-relaxed whitespace-pre-wrap">
+          {letterBody.split('\n').map((para, idx) => {
+            const trimmed = para.trim();
+            const isBold =
+              trimmed.startsWith('Subject:') ||
+              trimmed.startsWith('To,') ||
+              trimmed.startsWith('Dear') ||
+              trimmed.startsWith('Sincerely,') ||
+              trimmed.toLowerCase() === 'sincerely';
 
-          <div className="relative w-full h-[53mm] flex flex-col justify-center items-center px-10 pt-8 pb-2 box-border">
-            <h2 className="font-bold text-slate-800 text-2xl text-center uppercase leading-tight mb-2">
-              {coverFields.companyName.toUpperCase()}
-            </h2>
-            <p className="text-slate-600 text-sm text-center font-medium leading-relaxed max-w-lg mb-0.5">
-              {coverFields.referenceAddress}.
-            </p>
-            <p className="text-slate-600 text-sm text-center font-medium leading-normal">
-              Mobile: {companyData.phone || '01712345678'}
-            </p>
-            <p className="text-slate-600 text-sm text-center font-medium leading-normal">
-              Email:{' '}
-              {companyData.email ||
-                `info@${(coverFields.companyName || 'company')
-                  .toLowerCase()
-                  .replace(/\s+/g, '')}.com`}
-            </p>
-            <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#0C8493]" />
-          </div>
-
-          <div className="flex-grow px-12 py-8 box-border bg-white text-slate-900 text-sm leading-relaxed whitespace-pre-wrap">
-            {letterBody.split('\n').map((para, idx) => {
-              const trimmed = para.trim();
-              const isBold =
-                trimmed.startsWith('Subject:') ||
-                trimmed.startsWith('To,') ||
-                trimmed.startsWith('Dear') ||
-                trimmed.startsWith('Sincerely,') ||
-                trimmed.toLowerCase() === 'sincerely';
-
-              return (
-                <p
-                  key={idx}
-                  className={`mb-1 min-h-[1.5rem] ${isBold ? 'font-bold' : 'font-normal'}`}
-                >
-                  {para}
-                </p>
-              );
-            })}
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 h-[4.5mm] bg-[#FF8006]" />
+            return (
+              <p
+                key={idx}
+                className={`mb-1 min-h-[1.5rem] ${isBold ? 'font-bold' : 'font-normal'}`}
+              >
+                {para}
+              </p>
+            );
+          })}
         </div>
       </div>
     </motion.div>

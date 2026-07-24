@@ -126,7 +126,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   };
 
   return (
-    <div id="panel" className="bg-white h-full flex flex-col overflow-hidden w-full max-w-3xl mx-auto shrink-0 border-x border-[#DDDEDC] shadow-sm">
+    <div id="panel" className="bg-white h-full flex flex-col overflow-hidden w-full max-w-7xl mx-auto border-x border-[#DDDEDC] shadow-sm">
       {/* 1. FIXED HEADER AND MAIN TITLE */}
       <div className="p-5 border-b border-[#DDDEDC] bg-[#FBFBFA] flex justify-between items-center shrink-0">
         <div>
@@ -161,49 +161,49 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       )}
 
       {/* 2. SCROLLABLE BODY CONTAINING FORM & DESIGN OPTIONS */}
-      <div className="flex-grow flex-1 overflow-y-auto p-5 flex flex-col gap-5 bg-white">
+      <div className="flex-grow flex-1 overflow-y-auto p-5 md:p-8 flex flex-col gap-6 bg-white">
         {/* Company Fields */}
-        <div className="flex flex-col gap-3">
-          <div className="text-[10px] font-mono text-[var(--ui-accent)] uppercase tracking-wider font-bold border-b border-[#DDDEDC] pb-1">
+        <div className="flex flex-col gap-4">
+          <div className="text-[11px] font-mono text-[var(--ui-accent)] uppercase tracking-wider font-bold border-b border-[#DDDEDC] pb-1.5">
             Company Credentials
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
-              Company Name
-            </label>
-            <input type="text" {...getInputProps('companyName', 'e.g. Subarna Traders')} />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
-              Company Name Casing Style
-            </label>
-            <div className="flex gap-1.5">
-              {(['title', 'upper'] as const).map((c, idx) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => handleInputChange('casing', c)}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] cursor-pointer ${get3DBtnStyle(
-                    idx,
-                    (companyData.casing || 'title') === c
-                  )}`}
-                >
-                  {c === 'title' ? 'Title Case' : 'UPPERCASE'}
-                </button>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-2">
+              <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
+                Company Name
+              </label>
+              <input type="text" {...getInputProps('companyName', 'e.g. Subarna Traders')} />
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
-              Address
-            </label>
-            <input type="text" {...getInputProps('address', 'e.g. 24 Motijheel C/A, Dhaka-1000')} />
-          </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
+                Company Name Casing Style
+              </label>
+              <div className="flex gap-1.5">
+                {(['title', 'upper'] as const).map((c, idx) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => handleInputChange('casing', c)}
+                    className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] cursor-pointer ${get3DBtnStyle(
+                      idx,
+                      (companyData.casing || 'title') === c
+                    )}`}
+                  >
+                    {c === 'title' ? 'Title Case' : 'UPPERCASE'}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-3">
+              <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
+                Address
+              </label>
+              <input type="text" {...getInputProps('address', 'e.g. 24 Motijheel C/A, Dhaka-1000')} />
+            </div>
+
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
                 Telephone
@@ -217,31 +217,31 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               </label>
               <input type="email" {...getInputProps('email', 'Email address')} />
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
-              Website / Tagline
-            </label>
-            <input type="text" {...getInputProps('tagline', 'e.g. www.subarnatraders.com')} />
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-1">
+              <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
+                Website / Tagline
+              </label>
+              <input type="text" {...getInputProps('tagline', 'e.g. www.subarnatraders.com')} />
+            </div>
           </div>
         </div>
 
         {/* Employee Section */}
-        <div className="flex flex-col gap-3 border-t border-[#DDDEDC] pt-3">
-          <div className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider font-bold border-b border-[#DDDEDC] pb-1">
+        <div className="flex flex-col gap-4 border-t border-[#DDDEDC] pt-4">
+          <div className="text-[11px] font-mono text-[#6B7076] uppercase tracking-wider font-bold border-b border-[#DDDEDC] pb-1.5">
             Visiting Card Holder
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
-              Employee Name
-            </label>
-            <input type="text" {...getInputProps('empName', 'e.g. Md. Rahim Uddin')} />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-2">
+              <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
+                Employee Name
+              </label>
+              <input type="text" {...getInputProps('empName', 'e.g. Md. Rahim Uddin')} />
+            </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-2">
               <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
                 Designation
               </label>
@@ -254,16 +254,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
               </label>
               <input type="text" {...getInputProps('empPhone', 'Optional mobile')} />
             </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2">
+
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
                 Employee Email
               </label>
               <input type="email" {...getInputProps('empEmail', 'Optional employee email')} />
             </div>
-            <div className="flex flex-col gap-1">
+
+            <div className="flex flex-col gap-1 md:col-span-2 lg:col-span-2">
               <label className="text-[10px] font-mono text-[#6B7076] uppercase tracking-wider">
                 ID / Badge No
               </label>

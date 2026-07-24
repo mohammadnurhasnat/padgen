@@ -24,11 +24,12 @@ import { HistoryPanel } from './components/HistoryPanel';
 import { JobIDCard } from './components/JobIDCard';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { CoverLetterGenerator } from './components/CoverLetterGenerator';
+import { NOCGenerator } from './components/NOCGenerator';
 import { svgWrap, downloadBlob } from './utils';
 
 export default function App() {
-  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card'
-  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card'>('designer');
+  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card' | 'noc'
+  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card' | 'noc'>('designer');
   const [designerStep, setDesignerStep] = useState<'form' | 'preview'>('form');
 
   // ------------------------------------------
@@ -448,7 +449,7 @@ export default function App() {
       <HeaderNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Workspace Area */}
-      <main className="max-w-7xl mx-auto py-1 print:py-0">
+      <main className="w-full px-2 sm:px-4 md:px-6 py-1 print:py-0">
         <AnimatePresence mode="wait">
           {/* TAB 1: PAD & CARD DESIGNER */}
           {activeTab === 'designer' && (
@@ -550,6 +551,23 @@ export default function App() {
                 companyData={companyData}
                 onDataChange={setCompanyData}
                 uploadedLogo={uploadedLogo}
+                theme={THEMES[themeIdx]}
+              />
+            </motion.div>
+          )}
+
+          {/* TAB 4: NOC Generator */}
+          {activeTab === 'noc' && (
+            <motion.div
+              key="noc-view"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15 }}
+            >
+              <NOCGenerator
+                companyData={companyData}
+                setCompanyData={setCompanyData}
                 theme={THEMES[themeIdx]}
               />
             </motion.div>

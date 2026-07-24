@@ -69,14 +69,16 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
     if (!containerRef.current) return;
     const containerWidth = containerRef.current.clientWidth;
 
-    // Default targets from original script
+    // Dynamically calculate target width based on container width so it scales flexibly with screen width and browser zoom
     let targetPadWidth = 380;
     let targetCardWidth = 320;
 
-    // Adjust for smaller responsive screens
-    if (containerWidth < 900) {
-      targetPadWidth = Math.min(380, containerWidth - 40);
-      targetCardWidth = Math.min(320, containerWidth - 40);
+    if (containerWidth >= 1200) {
+      targetPadWidth = Math.min(540, Math.max(380, containerWidth * 0.38));
+      targetCardWidth = Math.min(440, Math.max(320, containerWidth * 0.30));
+    } else if (containerWidth < 900) {
+      targetPadWidth = Math.min(380, Math.max(260, containerWidth - 32));
+      targetCardWidth = Math.min(320, Math.max(240, containerWidth - 32));
     }
 
     setScales({
@@ -88,7 +90,17 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
   useEffect(() => {
     updateScaling();
     window.addEventListener('resize', updateScaling);
-    return () => window.removeEventListener('resize', updateScaling);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (containerRef.current) {
+      resizeObserver = new ResizeObserver(() => updateScaling());
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateScaling);
+      if (resizeObserver) resizeObserver.disconnect();
+    };
   }, [companyData]);
 
   const padHeight = 297 * mmToPx;
