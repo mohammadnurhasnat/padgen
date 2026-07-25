@@ -223,7 +223,14 @@ export function generateNOCPDF(
   category: NOCCategory,
   fields: NOCFields,
   customBody?: string,
-  theme?: Theme
+  theme?: Theme,
+  sealData?: {
+    sealImage: string;
+    sealPos: { x: number; y: number };
+    sealSize: number;
+    containerWidth: number;
+    containerHeight: number;
+  }
 ) {
   const doc = new jsPDF({
     unit: 'mm',
@@ -308,7 +315,32 @@ export function generateNOCPDF(
 
   renderFormattedText(doc, cleanBody, 20, 85, 170, 12, 8);
 
-  // 6. Footer Decorative Bar
+  // 6. Draw Seal / Stamp Image onto PDF if provided
+  if (sealData && sealData.sealImage) {
+    try {
+      const { sealImage, sealPos, sealSize, containerWidth, containerHeight } = sealData;
+      const cWidth = containerWidth || 600;
+      const cHeight = containerHeight || 800;
+
+      const imgProps = doc.getImageProperties(sealImage);
+      const aspect = (imgProps && imgProps.height && imgProps.width) 
+        ? imgProps.height / imgProps.width 
+        : 1;
+
+      const widthMm = (sealSize / cWidth) * 210;
+      const heightMm = widthMm * aspect;
+
+      const xMm = Math.max(0, Math.min(210 - widthMm, (sealPos.x / cWidth) * 210));
+      const yMm = Math.max(0, Math.min(297 - heightMm, (sealPos.y / cHeight) * 297));
+
+      const format = sealImage.includes('data:image/png') ? 'PNG' : 'JPEG';
+      doc.addImage(sealImage, format, xMm, yMm, widthMm, heightMm, undefined, 'FAST');
+    } catch (err) {
+      console.error('Failed to draw seal on PDF:', err);
+    }
+  }
+
+  // 7. Footer Decorative Bar
   doc.setFillColor(primaryColor);
   doc.rect(0, 287, 210, 10, 'F');
 

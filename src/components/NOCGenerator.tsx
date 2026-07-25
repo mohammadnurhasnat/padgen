@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileCheck,
   Building,
@@ -14,6 +14,14 @@ import {
   Eye,
   Edit3,
   History,
+  Stamp,
+  Upload,
+  Move,
+  Trash2,
+  ZoomIn,
+  ZoomOut,
+  ShieldCheck,
+  Scaling,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { CompanyData, Theme, HistoryItem } from '../types';
@@ -34,6 +42,7 @@ interface NOCGeneratorProps {
   onOpenHistory?: () => void;
   historyCount?: number;
   lastLoadedItem?: HistoryItem | null;
+  externalSealImage?: string | null;
 }
 
 export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
@@ -44,6 +53,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   onOpenHistory,
   historyCount = 0,
   lastLoadedItem,
+  externalSealImage,
 }) => {
   const [nocFields, setNocFields] = useState<NOCFields>(DEFAULT_NOC_FIELDS);
   const [selectedCategory, setSelectedCategory] = useState<NOCCategory>('Tourist');
@@ -51,6 +61,47 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   const [isManualEdit, setIsManualEdit] = useState<boolean>(false);
   const [nocMode, setNocMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Seal / Stamp states & refs
+  const [sealImage, setSealImage] = useState<string | null>(null);
+  const [sealPos, setSealPos] = useState<{ x: number; y: number }>({ x: 340, y: 520 });
+  const [sealSize, setSealSize] = useState<number>(120);
+  const [isResizing, setIsResizing] = useState<boolean>(false);
+  const sealInputRef = useRef<HTMLInputElement | null>(null);
+  const documentRef = useRef<HTMLDivElement | null>(null);
+
+  const handleResizePointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsResizing(true);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startSize = sealSize;
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      const maxDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+      const newSize = Math.max(50, Math.min(320, startSize + maxDelta));
+      setSealSize(newSize);
+    };
+
+    const onPointerUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+  };
+
+  // Sync external seal image when attached from Digital Seal Generator
+  useEffect(() => {
+    if (externalSealImage) {
+      setSealImage(externalSealImage);
+    }
+  }, [externalSealImage]);
 
   // Restore fields when a history item is loaded
   useEffect(() => {
@@ -61,6 +112,9 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
         setNocBody(lastLoadedItem.nocBody);
         setIsManualEdit(true);
       }
+      if (lastLoadedItem.nocSealImage) setSealImage(lastLoadedItem.nocSealImage);
+      if (lastLoadedItem.nocSealPos) setSealPos(lastLoadedItem.nocSealPos);
+      if (lastLoadedItem.nocSealSize) setSealSize(lastLoadedItem.nocSealSize);
     }
   }, [lastLoadedItem]);
 
@@ -77,6 +131,19 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
     if (key === 'companyAddress') setCompanyData((prev) => ({ ...prev, address: value }));
     if (key === 'applicantName') setCompanyData((prev) => ({ ...prev, empName: value }));
     if (key === 'designation') setCompanyData((prev) => ({ ...prev, empRole: value }));
+  };
+
+  const handleSealUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        if (evt.target?.result) {
+          setSealImage(evt.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleBodyChange = (value: string) => {
@@ -100,7 +167,16 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   };
 
   const handleDownloadPDF = () => {
-    generateNOCPDF(selectedCategory, nocFields, nocBody, theme);
+    const docRect = documentRef.current?.getBoundingClientRect();
+    const sealData = sealImage ? {
+      sealImage,
+      sealPos,
+      sealSize,
+      containerWidth: docRect?.width || 600,
+      containerHeight: docRect?.height || 800,
+    } : undefined;
+
+    generateNOCPDF(selectedCategory, nocFields, nocBody, theme, sealData);
 
     if (onSaveHistory) {
       const applicantName = nocFields.applicantName || DEMO_NOC_FIELDS.applicantName;
@@ -115,6 +191,9 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
         nocFields: { ...nocFields },
         nocCategory: selectedCategory,
         nocBody: nocBody,
+        nocSealImage: sealImage || undefined,
+        nocSealPos: sealPos,
+        nocSealSize: sealSize,
       });
     }
   };
@@ -504,11 +583,197 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Company Seal / Stamp Attachment Card */}
+          <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-neutral-200 shadow-xs space-y-2.5">
+            <div className="flex items-center justify-between border-b pb-1">
+              <h3 className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Stamp className="w-3.5 h-3.5 text-emerald-600" />
+                Company Seal / Stamp (সিল ও স্ট্যাম্প):
+              </h3>
+              {sealImage && (
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Attached
+                </span>
+              )}
+            </div>
+
+            <input
+              ref={sealInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleSealUpload}
+              className="hidden"
+            />
+
+            {!sealImage ? (
+              <button
+                type="button"
+                onClick={() => sealInputRef.current?.click()}
+                className="w-full py-3 px-4 border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
+              >
+                <Upload className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+                <span>Attach Official Seal Image (সিল আপলোড করুন)</span>
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 bg-neutral-50 p-2 rounded-lg border border-neutral-200">
+                  <div className="w-12 h-12 rounded border bg-white flex items-center justify-center p-1 overflow-hidden shrink-0">
+                    <img src={sealImage} alt="Seal Preview" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-neutral-800 truncate">Official Stamp Attached</p>
+                    <p className="text-[10px] text-emerald-600 font-medium">
+                      ডকুমেন্টের উপর মাউস দিয়ে ড্র্যাগ করে ইচ্ছামত স্থানে বসান
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSealImage(null)}
+                    className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    title="Remove Seal"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Size & Controls */}
+                <div className="flex items-center justify-between gap-2 text-xs bg-neutral-100 p-2 rounded-lg">
+                  <span className="text-[10px] font-bold text-neutral-600 uppercase">Seal Size:</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSealSize((s) => Math.max(60, s - 15))}
+                      className="p-1 bg-white hover:bg-neutral-200 border rounded font-bold text-neutral-700 cursor-pointer text-xs flex items-center justify-center"
+                      title="Zoom Out"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[11px] font-mono font-bold text-neutral-700 w-10 text-center">
+                      {sealSize}px
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSealSize((s) => Math.min(250, s + 15))}
+                      className="p-1 bg-white hover:bg-neutral-200 border rounded font-bold text-neutral-700 cursor-pointer text-xs flex items-center justify-center"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSealPos({ x: 340, y: 520 })}
+                    className="text-[10px] font-bold text-indigo-600 hover:underline cursor-pointer"
+                  >
+                    Reset Position
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Live Editor / Document Preview Stage */}
         <div className={`space-y-4 lg:col-span-7 ${nocMode === 'edit' ? 'block' : 'col-span-12'}`}>
-          <div className="bg-white rounded-xl border border-neutral-300 shadow-xl p-8 sm:p-12 min-h-[700px] flex flex-col justify-between relative overflow-hidden font-serif">
+          <div
+            ref={documentRef}
+            className="bg-white rounded-xl border border-neutral-300 shadow-xl p-8 sm:p-12 min-h-[700px] flex flex-col justify-between relative overflow-hidden font-serif"
+          >
+            {/* Draggable & Resizable Seal / Stamp Element */}
+            {sealImage && (
+              <motion.div
+                drag={!isResizing}
+                dragConstraints={documentRef}
+                dragElastic={0}
+                dragMomentum={false}
+                key={`seal-${sealPos.x}-${sealPos.y}`}
+                initial={{ x: 0, y: 0 }}
+                onDragEnd={(_, info) => {
+                  setSealPos((prev) => ({
+                    x: prev.x + info.offset.x,
+                    y: prev.y + info.offset.y,
+                  }));
+                }}
+                style={{
+                  position: 'absolute',
+                  left: `${sealPos.x}px`,
+                  top: `${sealPos.y}px`,
+                  width: `${sealSize}px`,
+                }}
+                className="z-30 cursor-grab active:cursor-grabbing group select-none touch-none"
+              >
+                <div className="relative border-2 border-dashed border-emerald-500/30 group-hover:border-emerald-500 rounded-xl p-1 transition-all bg-emerald-50/10">
+                  <img
+                    src={sealImage}
+                    alt="Company Seal / Stamp"
+                    className="w-full h-auto object-contain pointer-events-none drop-shadow-md select-none opacity-95 hover:opacity-100"
+                    draggable={false}
+                  />
+
+                  {/* Corner Resize Handle - Bottom Right */}
+                  <div
+                    onPointerDown={handleResizePointerDown}
+                    className="absolute -bottom-3 -right-3 w-7 h-7 bg-emerald-600 hover:bg-emerald-700 border-2 border-white rounded-full shadow-lg cursor-se-resize flex items-center justify-center transition-all z-50 text-white active:scale-125 hover:scale-110"
+                    title="Corner resize: Drag to resize seal (কোণায় চেপে টেনে বড়/ছোট করুন)"
+                  >
+                    <Scaling className="w-3.5 h-3.5" />
+                  </div>
+
+                  {/* Top-Right Quick Delete Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSealImage(null);
+                    }}
+                    className="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 hover:bg-rose-600 border-2 border-white rounded-full shadow-md text-white flex items-center justify-center font-bold text-xs cursor-pointer z-50 transition-transform hover:scale-110"
+                    title="Remove Seal (মুছে ফেলুন)"
+                  >
+                    ✕
+                  </button>
+
+                  {/* Top-Left Move Indicator */}
+                  <div
+                    className="absolute -top-3 -left-3 w-6 h-6 bg-neutral-800 text-white rounded-full shadow-md flex items-center justify-center text-xs z-40"
+                    title="Drag seal to move (টেনে সরান)"
+                  >
+                    <Move className="w-3 h-3 text-emerald-400" />
+                  </div>
+
+                  {/* Floating Action Badge on Hover */}
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover:flex items-center gap-2 bg-neutral-900/95 text-white px-3 py-1 rounded-full text-[10px] font-sans shadow-xl backdrop-blur-xs whitespace-nowrap z-50 border border-neutral-700">
+                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                      <Move className="w-3 h-3" /> Drag • Resize Corner
+                    </span>
+                    <span className="text-neutral-400">|</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSealSize((s) => Math.max(50, s - 15));
+                      }}
+                      className="hover:text-amber-300 px-1 font-black cursor-pointer bg-neutral-800 rounded hover:bg-neutral-700"
+                      title="Decrease Size"
+                    >
+                      -
+                    </button>
+                    <span className="font-mono text-emerald-300 text-[10px]">{sealSize}px</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSealSize((s) => Math.min(300, s + 15));
+                      }}
+                      className="hover:text-amber-300 px-1 font-black cursor-pointer bg-neutral-800 rounded hover:bg-neutral-700"
+                      title="Increase Size"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             {/* Top Company Pad Accent Bars */}
             <div
               className="absolute top-0 left-0 right-0 h-3"

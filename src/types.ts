@@ -83,6 +83,9 @@ export interface HistoryItem {
   nocFields?: any;
   nocCategory?: string;
   nocBody?: string;
+  nocSealImage?: string;
+  nocSealPos?: any;
+  nocSealSize?: number;
 
   // Job ID Card
   idOrientation?: 'horizontal' | 'vertical';

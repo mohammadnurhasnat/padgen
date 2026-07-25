@@ -25,12 +25,14 @@ import { JobIDCard } from './components/JobIDCard';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { CoverLetterGenerator } from './components/CoverLetterGenerator';
 import { NOCGenerator } from './components/NOCGenerator';
+import { DigitalSealGenerator } from './components/DigitalSealGenerator';
 import { svgWrap, downloadBlob } from './utils';
 
 export default function App() {
-  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card' | 'noc'
-  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card' | 'noc'>('designer');
+  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal'
+  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal'>('designer');
   const [designerStep, setDesignerStep] = useState<'form' | 'preview'>('form');
+  const [attachedSealImage, setAttachedSealImage] = useState<string | null>(null);
 
   // ------------------------------------------
   // Pad & Card Designer State
@@ -588,6 +590,28 @@ export default function App() {
                 onOpenHistory={() => setIsHistoryOpen(true)}
                 historyCount={historyList.length}
                 lastLoadedItem={lastLoadedItem}
+                externalSealImage={attachedSealImage}
+              />
+            </motion.div>
+          )}
+
+          {/* TAB 5: Digital Seal Generator */}
+          {activeTab === 'seal' && (
+            <motion.div
+              key="seal-view"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15 }}
+            >
+              <DigitalSealGenerator
+                companyData={companyData}
+                onOpenHistory={() => setIsHistoryOpen(true)}
+                historyCount={historyList.length}
+                onApplyToNOC={(sealUrl) => {
+                  setAttachedSealImage(sealUrl);
+                  setActiveTab('noc');
+                }}
               />
             </motion.div>
           )}
