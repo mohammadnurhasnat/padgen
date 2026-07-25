@@ -106,7 +106,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
           </div>
           <div>
             <h2 className="text-sm font-bold text-neutral-800 m-0">
-              {coverMode === 'edit' ? 'Drafting Space' : 'Document Preview'}
+              {coverMode === 'edit' ? 'Document Edit' : 'Document Preview'}
             </h2>
           </div>
         </div>
@@ -123,7 +123,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
               }`}
             >
-              Preview Mode
+              Preview
             </button>
             <button
               onClick={() => setCoverMode('edit')}
@@ -133,7 +133,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                   : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
               }`}
             >
-              Edit Mode
+              Edit
             </button>
           </div>
 
@@ -155,24 +155,13 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
             Reset
           </button>
 
-          <button
-            onClick={() => {
-              try {
-                window.print();
-              } catch (e) {
-                alert('Printing blocked in preview. Please open in a new tab.');
-              }
-            }}
-            className="bg-purple-600 hover:bg-purple-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
-          >
-            Print
-          </button>
+          
 
           <button
             onClick={handleDownloadPDF}
             className="bg-emerald-600 hover:bg-emerald-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
           >
-            Download PDF
+            Download
           </button>
         </div>
       </div>

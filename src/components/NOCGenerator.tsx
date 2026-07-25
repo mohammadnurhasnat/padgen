@@ -36,7 +36,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   theme,
 }) => {
   const [nocFields, setNocFields] = useState<NOCFields>(DEFAULT_NOC_FIELDS);
-  const [selectedCategory, setSelectedCategory] = useState<NOCCategory>('Foreign Travel & Visa');
+  const [selectedCategory, setSelectedCategory] = useState<NOCCategory>('Tourist');
   const [nocBody, setNocBody] = useState<string>('');
   const [isManualEdit, setIsManualEdit] = useState<boolean>(false);
   const [nocMode, setNocMode] = useState<'edit' | 'preview'>('edit');
@@ -61,13 +61,12 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
     }
   }, [nocFields, selectedCategory, isManualEdit]);
 
-  const handleFieldChange = (key: keyof NOCFields, value: string) => {
+  const handleFieldChange = (key: keyof NOCFields, value: any) => {
     setNocFields((prev) => ({ ...prev, [key]: value }));
     if (key === 'companyName') setCompanyData((prev) => ({ ...prev, companyName: value }));
     if (key === 'companyAddress') setCompanyData((prev) => ({ ...prev, address: value }));
     if (key === 'applicantName') setCompanyData((prev) => ({ ...prev, empName: value }));
     if (key === 'designation') setCompanyData((prev) => ({ ...prev, empRole: value }));
-    if (key === 'empId') setCompanyData((prev) => ({ ...prev, empId: value }));
   };
 
   const handleBodyChange = (value: string) => {
@@ -111,11 +110,9 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
           </div>
           <div>
             <h2 className="text-sm font-bold text-neutral-800 m-0">
-              No Objection Certificate (NOC) Generator
+              NOC Generator
             </h2>
-            <p className="text-xs text-neutral-500 m-0">
-              Create official company NOC letters for foreign visas, higher studies, or project transfers.
-            </p>
+            
           </div>
         </div>
 
@@ -133,7 +130,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
               }`}
             >
               <Eye className="w-3 h-3" />
-              Preview Mode
+              Preview
             </button>
             <button
               type="button"
@@ -145,7 +142,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
               }`}
             >
               <Edit3 className="w-3 h-3" />
-              Edit Mode
+              Edit
             </button>
           </div>
 
@@ -176,7 +173,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5"
           >
             <Download className="w-3.5 h-3.5" />
-            Download NOC PDF
+            Download
           </button>
         </div>
       </div>
@@ -186,11 +183,11 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
         {/* Left Form Panel */}
         <div className={`space-y-5 lg:col-span-5 ${nocMode === 'preview' ? 'hidden lg:block' : ''}`}>
           {/* Category Selector */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs space-y-3">
-            <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider block">
-              NOC Purpose / Category
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 shadow-xs space-y-2">
+            <label className="text-[10px] sm:text-xs font-bold text-neutral-500 titlecase tracking-wider block">
+              NOC Purpose / Category:
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
               {NOC_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -199,7 +196,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                     setSelectedCategory(cat);
                     setNocFields((prev) => ({ ...prev, purposeCategory: cat }));
                   }}
-                  className={`px-3 py-2 text-xs font-semibold rounded-lg border text-left transition-all cursor-pointer ${
+                  className={`px-2 py-1.5 text-[11px] sm:text-xs font-semibold rounded-md sm:rounded-lg border text-center flex items-center justify-center transition-all cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300'
                       : 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
@@ -212,207 +209,250 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
           </div>
 
           {/* Employee & Applicant Details */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex items-center gap-1.5 border-b pb-2">
-              <User className="w-4 h-4 text-emerald-600" />
-              Applicant / Employee Information
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 shadow-xs space-y-3">
+            <h3 className="text-[10px] sm:text-xs font-bold text-neutral-500 titlecase tracking-wider flex items-center gap-1.5 border-b pb-1.5">
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+              Applicant Information:
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
-                  Applicant Full Name
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
+                  Full Name
                 </label>
                 <input
                   type="text"
                   value={nocFields.applicantName}
                   onChange={(e) => handleFieldChange('applicantName', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="Alex Mercer"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Designation / Role
                 </label>
                 <input
                   type="text"
                   value={nocFields.designation}
                   onChange={(e) => handleFieldChange('designation', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="Senior Product Designer"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
-                  Employee ID
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
+                  Gender
                 </label>
-                <input
-                  type="text"
-                  value={nocFields.empId}
-                  onChange={(e) => handleFieldChange('empId', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
-                  placeholder="EMP-9042"
-                />
+                <div className="grid grid-cols-2 gap-1 p-0.5 bg-neutral-100 border border-neutral-200 rounded-md sm:rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => handleFieldChange('gender', 'male')}
+                    className={`py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                      (nocFields.gender || 'male') === 'male'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    Male
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFieldChange('gender', 'female')}
+                    className={`py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                      nocFields.gender === 'female'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-neutral-600 hover:text-neutral-900'
+                    }`}
+                  >
+                    Female
+                  </button>
+                </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Passport / NID No
                 </label>
                 <input
                   type="text"
                   value={nocFields.passportNo}
                   onChange={(e) => handleFieldChange('passportNo', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="A08942159"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Date of Joining
                 </label>
                 <input
                   type="date"
                   value={nocFields.joiningDate}
                   onChange={(e) => handleFieldChange('joiningDate', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Travel / Purpose / Duration Details */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex items-center gap-1.5 border-b pb-2">
-              <MapPin className="w-4 h-4 text-emerald-600" />
-              Travel & Purpose Details
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 shadow-xs space-y-3">
+            <h3 className="text-[10px] sm:text-xs font-bold text-neutral-500 titlecase tracking-wider flex items-center gap-1.5 border-b pb-1.5">
+              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+              Travel & Purpose Details:
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <div className="sm:col-span-2">
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
-                  Destination Country / University / Location
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
+                  Country / Location
                 </label>
                 <input
                   type="text"
                   value={nocFields.destinationCountry}
                   onChange={(e) => handleFieldChange('destinationCountry', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
-                  placeholder="United Kingdom"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  placeholder="India"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Leave Start Date
                 </label>
                 <input
                   type="date"
                   value={nocFields.leaveFrom}
                   onChange={(e) => handleFieldChange('leaveFrom', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Leave End Date
                 </label>
                 <input
                   type="date"
                   value={nocFields.leaveTo}
                   onChange={(e) => handleFieldChange('leaveTo', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
               </div>
             </div>
           </div>
 
           {/* Company & Signatory Details */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider flex items-center gap-1.5 border-b pb-2">
-              <Building className="w-4 h-4 text-emerald-600" />
-              Organization & Signatory Details
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 shadow-xs space-y-3">
+            <h3 className="text-[10px] sm:text-xs font-bold text-neutral-500 titlecase tracking-wider flex items-center gap-1.5 border-b pb-1.5">
+              <Building className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+              Organization & Signatory Details:
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Ref No
                 </label>
                 <input
                   type="text"
                   value={nocFields.refNo}
                   onChange={(e) => handleFieldChange('refNo', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="NOC/2026/089"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Issue Date
                 </label>
                 <input
                   type="date"
                   value={nocFields.issueDate}
                   onChange={(e) => handleFieldChange('issueDate', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Company Name
                 </label>
                 <input
                   type="text"
                   value={nocFields.companyName}
                   onChange={(e) => handleFieldChange('companyName', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="Acme Corporation Ltd."
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Company Address
                 </label>
                 <input
                   type="text"
                   value={nocFields.companyAddress}
                   onChange={(e) => handleFieldChange('companyAddress', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="123 Business Avenue, Suite 400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
+                  Mobile / Phone Number
+                </label>
+                <input
+                  type="text"
+                  value={nocFields.companyPhone}
+                  onChange={(e) => handleFieldChange('companyPhone', e.target.value)}
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  placeholder="+1 (555) 019-2834"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
+                  Company Email
+                </label>
+                <input
+                  type="email"
+                  value={nocFields.companyEmail}
+                  onChange={(e) => handleFieldChange('companyEmail', e.target.value)}
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  placeholder="hr@acmecorp.com"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Signatory Name
                 </label>
                 <input
                   type="text"
                   value={nocFields.signatoryName}
                   onChange={(e) => handleFieldChange('signatoryName', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="Robert Vance"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-neutral-600 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-semibold text-neutral-600 block mb-0.5 sm:mb-1">
                   Signatory Title
                 </label>
                 <input
                   type="text"
                   value={nocFields.signatoryTitle}
                   onChange={(e) => handleFieldChange('signatoryTitle', e.target.value)}
-                  className="w-full text-xs px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
+                  className="w-full text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 border rounded-md sm:rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none"
                   placeholder="Head of Human Resources"
                 />
               </div>
@@ -468,9 +508,17 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                   />
                 </div>
               ) : (
-                <div className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif p-4 bg-white/90">
-                  {nocBody}
-                </div>
+                <div
+                  className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif p-4 bg-white/90"
+                  dangerouslySetInnerHTML={{
+                    __html: nocBody
+                      .replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/&lt;b&gt;/g, '<strong class="font-bold text-neutral-950">')
+                      .replace(/&lt;\/b&gt;/g, '</strong>')
+                  }}
+                />
               )}
             </div>
 

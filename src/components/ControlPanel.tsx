@@ -134,10 +134,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             href="https://extractor.fun"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/30 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-extrabold px-3.5 py-1.5 rounded-full text-[11px] transition-all cursor-pointer inline-flex items-center gap-1.5"
+            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 border-b-[4px] border-indigo-950 active:border-b-0 active:translate-y-[4px] shadow-md hover:shadow-indigo-500/20 text-white font-extrabold px-4 py-1.5 rounded-xl text-[12px] transition-all cursor-pointer inline-flex items-center gap-1.5 select-none"
             title="Go to Extractor (extractor.fun)"
           >
-            <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+            <ArrowLeft className="w-3.5 h-3.5 stroke-[3]" />
             <span>Extractor</span>
           </a>
         </div>

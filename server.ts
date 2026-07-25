@@ -76,7 +76,7 @@ Choose the layout formats wisely:
 - textCasing: one of 'title', 'upper', 'lower'`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         systemInstruction,
@@ -140,7 +140,7 @@ Choose the layout formats wisely:
                 },
                 textCasing: { 
                   type: Type.STRING,
-                  enum: ['title', 'upper', 'lower']
+                  enum: ['title', 'upper']
                 }
               },
               required: [

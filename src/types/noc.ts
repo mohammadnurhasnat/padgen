@@ -1,8 +1,8 @@
 export type NOCCategory =
-  | 'Foreign Travel & Visa'
-  | 'Higher Studies'
-  | 'Job / Project Transfer'
-  | 'General No Objection';
+  | 'Tourist'
+  | 'Medical'
+  | 'Business'
+  | 'Double-Entry';
 
 export interface NOCFields {
   refNo: string;
@@ -12,6 +12,7 @@ export interface NOCFields {
   companyPhone: string;
   companyEmail: string;
   applicantName: string;
+  gender: 'male' | 'female';
   designation: string;
   empId: string;
   passportNo: string;
@@ -25,10 +26,10 @@ export interface NOCFields {
 }
 
 export const NOC_CATEGORIES: NOCCategory[] = [
-  'Foreign Travel & Visa',
-  'Higher Studies',
-  'Job / Project Transfer',
-  'General No Objection',
+  'Tourist',
+  'Medical',
+  'Business',
+  'Double-Entry',
 ];
 
 export const DEFAULT_NOC_FIELDS: NOCFields = {
@@ -39,12 +40,13 @@ export const DEFAULT_NOC_FIELDS: NOCFields = {
   companyPhone: '+1 (555) 019-2834',
   companyEmail: 'hr@acmecorp.com',
   applicantName: 'Alex Mercer',
+  gender: 'male',
   designation: 'Senior Product Designer',
   empId: 'EMP-9042',
   passportNo: 'A08942159',
   joiningDate: '2021-03-15',
-  purposeCategory: 'Foreign Travel & Visa',
-  destinationCountry: 'United Kingdom',
+  purposeCategory: 'Tourist',
+  destinationCountry: 'India',
   leaveFrom: '2026-08-10',
   leaveTo: '2026-08-25',
   signatoryName: 'Robert Vance',
