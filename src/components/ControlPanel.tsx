@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Sparkles, History } from 'lucide-react';
+import { Sparkles, History, ArrowLeft } from 'lucide-react';
 import { CompanyData, DesignControls } from '../types';
 import { 
   HEADLINE_FONTS, 
@@ -130,9 +130,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* 1. FIXED HEADER AND MAIN TITLE */}
       <div className="p-5 border-b border-[#DDDEDC] bg-[#FBFBFA] flex justify-between items-center shrink-0">
         <div>
-          <h1 className="text-[14px] font-bold tracking-wider text-[#1C1E22] m-0">
-            PadGen
-          </h1>
+          <a
+            href="https://extractor.fun"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/30 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-extrabold px-3.5 py-1.5 rounded-full text-[11px] transition-all cursor-pointer inline-flex items-center gap-1.5"
+            title="Go to Extractor (extractor.fun)"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>Extractor</span>
+          </a>
         </div>
         <button
           onClick={onOpenHistory}

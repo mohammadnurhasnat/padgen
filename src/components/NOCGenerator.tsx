@@ -125,18 +125,6 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
           <div className="inline-flex items-center p-0.5 rounded-full bg-neutral-100 border border-neutral-200 gap-1">
             <button
               type="button"
-              onClick={() => setNocMode('edit')}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                nocMode === 'edit'
-                  ? 'bg-emerald-600 text-white border-b-[3px] border-black/30 shadow-md ring-2 ring-emerald-400 ring-offset-1'
-                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
-              }`}
-            >
-              <Edit3 className="w-3 h-3" />
-              Edit Mode
-            </button>
-            <button
-              type="button"
               onClick={() => setNocMode('preview')}
               className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
                 nocMode === 'preview'
@@ -146,6 +134,18 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             >
               <Eye className="w-3 h-3" />
               Preview Mode
+            </button>
+            <button
+              type="button"
+              onClick={() => setNocMode('edit')}
+              className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                nocMode === 'edit'
+                  ? 'bg-emerald-600 text-white border-b-[3px] border-black/30 shadow-md ring-2 ring-emerald-400 ring-offset-1'
+                  : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
+              }`}
+            >
+              <Edit3 className="w-3 h-3" />
+              Edit Mode
             </button>
           </div>
 
