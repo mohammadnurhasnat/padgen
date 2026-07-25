@@ -86,18 +86,13 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
       reader.onload = (evt) => {
         if (evt.target?.result) {
           handleFieldChange('empPhoto', evt.target.result as string);
-          // Default auto-fit on upload so heads/sides aren't cut
+          // Default normal photo placement on upload
           setPhotoFitMode('contain');
-          setPhotoAutoEnhanced(true);
+          setPhotoAutoEnhanced(false);
         }
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleAutoFitPhoto = () => {
-    setPhotoFitMode('contain');
-    setPhotoAutoEnhanced(true);
   };
 
   const cycleCardStyle = () => {
@@ -380,19 +375,19 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 <span>{orientation === 'horizontal' ? 'Landscape' : 'Portrait'}</span>
               </button>
 
-              {/* Auto-Fit Photo Button (if photo exists) */}
+              {/* Single Toggle Button for Photo Frame (Fill Frame / Default Fit) */}
               {companyData.empPhoto && (
                 <button
-                  onClick={handleAutoFitPhoto}
-                  className={`border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm font-bold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1.5 ${
-                    photoFitMode === 'contain' && photoAutoEnhanced
-                      ? 'bg-amber-500 hover:bg-amber-400 text-white'
-                      : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-300'
+                  onClick={() => setPhotoFitMode(photoFitMode === 'cover' ? 'contain' : 'cover')}
+                  className={`border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1.5 ${
+                    photoFitMode === 'cover'
+                      ? 'bg-amber-600 hover:bg-amber-500'
+                      : 'bg-emerald-600 hover:bg-emerald-500'
                   }`}
-                  title="Auto-fit photo so head and sides are not cut off"
+                  title={photoFitMode === 'cover' ? 'Switch to Default Fit' : 'Switch to Fill Frame'}
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Auto-Fit Photo</span>
+                  <span>{photoFitMode === 'cover' ? 'Default Fit' : 'Fill Frame'}</span>
                 </button>
               )}
             </div>
@@ -405,7 +400,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 className="bg-teal-600 hover:bg-teal-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm active:translate-y-[2px] transition-all cursor-pointer flex items-center gap-1 sm:gap-2"
               >
                 <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>{isExporting ? 'Generating...' : 'Card PDF (A4)'}</span>
+                <span>{isExporting ? 'Generating...' : 'Card PDF'}</span>
               </button>
               <button
                 onClick={() => handleDownloadPNG('both')}
@@ -417,43 +412,6 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               </button>
             </div>
           </div>
-
-          {/* Photo Adjustment Controls Bar if Photo exists */}
-          {companyData.empPhoto && (
-            <div className="bg-neutral-900 text-white rounded-xl p-3 px-4 flex flex-wrap items-center justify-between gap-3 text-xs shadow-md">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-emerald-400" />
-                <span className="font-bold text-emerald-300 uppercase tracking-wider text-[11px]">Photo Frame Fitting:</span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  onClick={() => setPhotoFitMode('contain')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
-                    photoFitMode === 'contain' ? 'bg-emerald-500 text-white' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                  }`}
-                >
-                  Fit Entire Photo (No Crop)
-                </button>
-                <button
-                  onClick={() => setPhotoFitMode('cover')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
-                    photoFitMode === 'cover' ? 'bg-emerald-500 text-white' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                  }`}
-                >
-                  Fill Frame
-                </button>
-                <button
-                  onClick={() => setPhotoAutoEnhanced(!photoAutoEnhanced)}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 ${
-                    photoAutoEnhanced ? 'bg-amber-500 text-white' : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
-                  }`}
-                >
-                  {photoAutoEnhanced && <Check className="w-3 h-3" />}
-                  Auto Color/Contrast
-                </button>
-              </div>
-            </div>
-          )}
 
           <div className="w-full flex justify-center bg-neutral-200 overflow-hidden rounded-2xl border border-neutral-300 h-[70vh] sm:h-[80vh] items-center relative">
             <div 
