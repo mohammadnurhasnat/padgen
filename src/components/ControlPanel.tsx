@@ -16,7 +16,8 @@ import {
   GRID_STYLE_LABELS, 
   TEXTURES, 
   TEXTURE_LABELS, 
-  DEFAULT_COMPANY_DATA 
+  DEFAULT_COMPANY_DATA,
+  DEMO_COMPANY_DATA
 } from '../data';
 
 // 3D tactile button color palette with vibrant distinct colors
@@ -109,8 +110,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   };
 
   const getInputProps = (field: keyof CompanyData, placeholder: string) => ({
-    value: companyData[field] === (DEFAULT_COMPANY_DATA as any)[field] ? '' : (companyData[field] || ''),
-    placeholder: (DEFAULT_COMPANY_DATA as any)[field] || placeholder,
+    value: companyData[field] || '',
+    placeholder: (DEMO_COMPANY_DATA as any)[field] || placeholder,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleInputChange(field, e.target.value),
     className: "w-full p-2 border border-[#DDDEDC] rounded text-[13px] bg-[#FBFBFA] text-neutral-900 focus:outline-none focus:ring-1 focus:ring-[var(--ui-accent)] focus:border-[var(--ui-accent)] transition-all",
   });

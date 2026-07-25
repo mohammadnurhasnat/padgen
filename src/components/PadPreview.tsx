@@ -1,5 +1,6 @@
 import React from 'react';
 import { CompanyData, Theme } from '../types';
+import { DEMO_COMPANY_DATA } from '../data';
 import { getInitials, logoMarkSVG, hexToRgba, nameFontSize, formatCompanyName, getTextureStyles, getGridStyles } from '../utils';
 
 interface PadPreviewProps {
@@ -17,7 +18,7 @@ interface PadPreviewProps {
 }
 
 const PadPreviewInner: React.FC<PadPreviewProps> = ({
-  data,
+  data: rawData,
   theme,
   shape,
   layout,
@@ -29,6 +30,17 @@ const PadPreviewInner: React.FC<PadPreviewProps> = ({
   uploadedLogoSize = 90,
   uploadedLogoOpacity = 0.12,
 }) => {
+  const data: CompanyData = {
+    ...rawData,
+    companyName: rawData.companyName || DEMO_COMPANY_DATA.companyName,
+    address: rawData.address || DEMO_COMPANY_DATA.address,
+    phone: rawData.phone || DEMO_COMPANY_DATA.phone,
+    email: rawData.email || DEMO_COMPANY_DATA.email,
+    tagline: rawData.tagline || DEMO_COMPANY_DATA.tagline,
+    empName: rawData.empName || DEMO_COMPANY_DATA.empName,
+    empRole: rawData.empRole || DEMO_COMPANY_DATA.empRole,
+  };
+
   const initials = getInitials(data.companyName);
   
   // Enforce clean classic light paper tones

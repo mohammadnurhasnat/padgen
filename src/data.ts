@@ -421,7 +421,7 @@ export const TEXTURE_LABELS = {
   wood: 'Wood Grain'
 };
 
-export const DEFAULT_COMPANY_DATA: CompanyData = {
+export const DEMO_COMPANY_DATA: CompanyData = {
   companyName: "Processing Hub",
   address: "34/D, Level-3, Jamuna Future Park, Vatara, Dhaka-1229",
   phone: "+8801332601510",
@@ -432,6 +432,21 @@ export const DEFAULT_COMPANY_DATA: CompanyData = {
   empPhone: "+8801861186863",
   empEmail: "mohammadnurhasnat@gmail.com",
   empIdNumber: "PH-88026",
+  casing: 'title',
+  industry: 'corporate',
+};
+
+export const DEFAULT_COMPANY_DATA: CompanyData = {
+  companyName: "",
+  address: "",
+  phone: "",
+  email: "",
+  tagline: "",
+  empName: "",
+  empRole: "",
+  empPhone: "",
+  empEmail: "",
+  empIdNumber: "",
   casing: 'title',
   industry: 'corporate',
 };

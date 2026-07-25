@@ -1,14 +1,18 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import * as htmlToImage from 'html-to-image';
-import { CompanyData, Theme } from '../types';
-import { Sparkles, ArrowLeft, Download } from 'lucide-react';
+import { CompanyData, Theme, HistoryItem } from '../types';
+import { DEMO_COMPANY_DATA } from '../data';
+import { Sparkles, ArrowLeft, Download, History } from 'lucide-react';
 
 interface JobIDCardProps {
   companyData: CompanyData;
   onDataChange: (data: CompanyData) => void;
   uploadedLogo: string;
   theme: Theme;
+  onSaveHistory?: (item: HistoryItem) => void;
+  onOpenHistory?: () => void;
+  historyCount?: number;
 }
 
 export const JobIDCard: React.FC<JobIDCardProps> = ({
@@ -16,6 +20,9 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
   onDataChange,
   uploadedLogo,
   theme,
+  onSaveHistory,
+  onOpenHistory,
+  historyCount = 0,
 }) => {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const frontCardRef = useRef<HTMLDivElement>(null);
@@ -117,7 +124,21 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
       pdf.addImage(backDataUrl, 'PNG', startX, backY, cardW, cardH);
       pdf.rect(startX, backY, cardW, cardH);
 
-      pdf.save(`${companyData.companyName || 'Company'}_Job_ID_Card_A4.pdf`);
+      const filename = `${companyData.companyName || DEMO_COMPANY_DATA.companyName}_Job_ID_Card_A4.pdf`;
+      pdf.save(filename);
+
+      if (onSaveHistory) {
+        onSaveHistory({
+          id: 'id-card-' + Date.now(),
+          timestamp: new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', ''),
+          section: 'id-card',
+          title: companyData.empName || companyData.companyName || 'Job ID Card',
+          type: 'id-card-pdf',
+          filename: filename,
+          data: { ...companyData },
+          idOrientation: orientation,
+        });
+      }
     } catch (err) {
       console.error('Error generating A4 PDF:', err);
     } finally {
@@ -141,16 +162,31 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {onOpenHistory && (
+                <button
+                  onClick={onOpenHistory}
+                  className="bg-amber-500 hover:bg-amber-400 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  <span>History</span>
+                  {historyCount > 0 && (
+                    <span className="bg-white/30 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                      {historyCount}
+                    </span>
+                  )}
+                </button>
+              )}
+
               <button
                 onClick={() => setOrientation(orientation === 'horizontal' ? 'vertical' : 'horizontal')}
-                className="bg-indigo-600 hover:bg-indigo-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer"
+                className="bg-indigo-600 hover:bg-indigo-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer"
               >
                 Layout: {orientation === 'horizontal' ? 'Landscape' : 'Portrait'}
               </button>
 
               <button
                 onClick={() => photoInputRef.current?.click()}
-                className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer"
+                className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all cursor-pointer"
               >
                 Upload Photo
               </button>
@@ -158,7 +194,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               {companyData.empPhoto && (
                 <button
                   onClick={() => handleFieldChange('empPhoto', '')}
-                  className="bg-rose-600 hover:bg-rose-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-2 rounded-xl text-xs transition-all cursor-pointer"
+                  className="bg-rose-600 hover:bg-rose-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-2 rounded-xl text-xs transition-all cursor-pointer"
                 >
                   Remove Photo
                 </button>
@@ -181,7 +217,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 type="text"
                 value={companyData.companyName || ''}
                 onChange={(e) => handleFieldChange('companyName', e.target.value)}
-                placeholder="Company Name"
+                placeholder={DEMO_COMPANY_DATA.companyName}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -192,7 +228,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 type="text"
                 value={companyData.empName || ''}
                 onChange={(e) => handleFieldChange('empName', e.target.value)}
-                placeholder="Employee Name"
+                placeholder={DEMO_COMPANY_DATA.empName}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -203,7 +239,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 type="text"
                 value={companyData.empRole || ''}
                 onChange={(e) => handleFieldChange('empRole', e.target.value)}
-                placeholder="Designation"
+                placeholder={DEMO_COMPANY_DATA.empRole}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -212,9 +248,9 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">ID / Badge Number</label>
               <input
                 type="text"
-                value={companyData.empIdNumber || 'PH-88026'}
+                value={companyData.empIdNumber || ''}
                 onChange={(e) => handleFieldChange('empIdNumber', e.target.value)}
-                placeholder="ID Number"
+                placeholder={DEMO_COMPANY_DATA.empIdNumber}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -223,9 +259,9 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Employee Mobile</label>
               <input
                 type="text"
-                value={companyData.empPhone || companyData.phone || ''}
+                value={companyData.empPhone || ''}
                 onChange={(e) => handleFieldChange('empPhone', e.target.value)}
-                placeholder="Mobile Number"
+                placeholder={DEMO_COMPANY_DATA.empPhone}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -234,9 +270,9 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Employee Email</label>
               <input
                 type="email"
-                value={companyData.empEmail || companyData.email || ''}
+                value={companyData.empEmail || ''}
                 onChange={(e) => handleFieldChange('empEmail', e.target.value)}
-                placeholder="Employee Email"
+                placeholder={DEMO_COMPANY_DATA.empEmail}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>
@@ -247,7 +283,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                 type="text"
                 value={companyData.address || ''}
                 onChange={(e) => handleFieldChange('address', e.target.value)}
-                placeholder="Address"
+                placeholder={DEMO_COMPANY_DATA.address}
                 className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
             </div>

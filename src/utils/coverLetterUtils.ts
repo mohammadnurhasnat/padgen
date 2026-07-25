@@ -1,35 +1,35 @@
 import { jsPDF } from 'jspdf';
-import { CoverLetterFields, VisaCategory } from '../types/coverLetter';
+import { CoverLetterFields, VisaCategory, DEMO_COVER_LETTER_FIELDS } from '../types/coverLetter';
 import { CompanyData, Theme } from '../types';
+import { DEMO_COMPANY_DATA } from '../data';
 
 export function formatDateString(dateStr: string): string {
   if (!dateStr) return '';
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   } catch {
     return dateStr;
   }
 }
 
 export function generateTemplateText(category: VisaCategory, fields: CoverLetterFields): string {
-  const {
-    applicantName,
-    passportNumber,
-    dob,
-    companyName,
-    designation,
-    joiningDate,
-    patientInfo,
-    travelFromDate,
-    travelToDate,
-    referenceAddress,
-    letterDate,
-  } = fields;
+  const applicantName = fields.applicantName || DEMO_COVER_LETTER_FIELDS.applicantName;
+  const passportNumber = fields.passportNumber || DEMO_COVER_LETTER_FIELDS.passportNumber;
+  const dob = fields.dob || DEMO_COVER_LETTER_FIELDS.dob;
+  const companyName = fields.companyName || DEMO_COVER_LETTER_FIELDS.companyName;
+  const designation = fields.designation || DEMO_COVER_LETTER_FIELDS.designation;
+  const joiningDate = fields.joiningDate || DEMO_COVER_LETTER_FIELDS.joiningDate;
+  const patientInfo = fields.patientInfo || DEMO_COVER_LETTER_FIELDS.patientInfo;
+  const travelFromDate = fields.travelFromDate || DEMO_COVER_LETTER_FIELDS.travelFromDate;
+  const travelToDate = fields.travelToDate || DEMO_COVER_LETTER_FIELDS.travelToDate;
+  const referenceAddress = fields.referenceAddress || DEMO_COVER_LETTER_FIELDS.referenceAddress;
+  const letterDate = fields.letterDate || DEMO_COVER_LETTER_FIELDS.letterDate;
 
   const fDob = formatDateString(dob) || '[Date of Birth]';
   const fJoiningDate = formatDateString(joiningDate) || '[Joining Date]';

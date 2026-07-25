@@ -1,5 +1,6 @@
 import React from 'react';
 import { CompanyData, Theme } from '../types';
+import { DEMO_COMPANY_DATA } from '../data';
 import { getInitials, logoMarkSVG, hexToRgba, formatCompanyName, getTextureStyles, getGridStyles } from '../utils';
 
 
@@ -120,7 +121,7 @@ const renderDecorationsAroundNameCard = (
 };
 
 const CardPreviewInner: React.FC<CardPreviewProps> = ({
-  data,
+  data: rawData,
   theme,
   shape,
   layout,
@@ -130,6 +131,16 @@ const CardPreviewInner: React.FC<CardPreviewProps> = ({
   texture = 'none',
   uploadedLogo,
 }) => {
+  const data: CompanyData = {
+    ...rawData,
+    companyName: rawData.companyName || DEMO_COMPANY_DATA.companyName,
+    address: rawData.address || DEMO_COMPANY_DATA.address,
+    phone: rawData.phone || DEMO_COMPANY_DATA.phone,
+    email: rawData.email || DEMO_COMPANY_DATA.email,
+    tagline: rawData.tagline || DEMO_COMPANY_DATA.tagline,
+    empName: rawData.empName || DEMO_COMPANY_DATA.empName,
+    empRole: rawData.empRole || DEMO_COMPANY_DATA.empRole,
+  };
   const initials = getInitials(data.companyName);
   const mark = uploadedLogo
     ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%"><image href="${uploadedLogo}" x="0" y="0" width="200" height="200" preserveAspectRatio="xMidYMid meet"/></svg>`

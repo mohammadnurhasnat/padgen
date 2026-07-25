@@ -404,17 +404,32 @@ export default function App() {
     }
   };
 
+  const handleSaveHistoryItem = (item: HistoryItem) => {
+    const updated = [item, ...historyList];
+    setHistoryList(updated);
+    localStorage.setItem('padgen_history', JSON.stringify(updated));
+  };
+
   const handleLoadHistoryItem = (item: HistoryItem) => {
-    setCompanyData(item.data);
-    const themeIndex = THEMES.findIndex(t => t.name === item.theme.name);
-    if (themeIndex !== -1) setThemeIdx(themeIndex);
-    setResolvedShape(item.shape);
-    setResolvedPadLayout(item.padLayout);
-    setResolvedCardLayout(item.cardLayout);
-    setResolvedFontIdx(item.fontIdx);
-    setResolvedLogoStyle(item.logoStyle);
-    setResolvedGridStyle(item.gridStyle);
-    setResolvedTexture(item.texture);
+    if (item.data) {
+      setCompanyData(item.data);
+    }
+    if (item.theme) {
+      const themeIndex = THEMES.findIndex(t => t.name === item.theme?.name);
+      if (themeIndex !== -1) setThemeIdx(themeIndex);
+    }
+    if (item.shape) setResolvedShape(item.shape);
+    if (item.padLayout) setResolvedPadLayout(item.padLayout);
+    if (item.cardLayout) setResolvedCardLayout(item.cardLayout);
+    if (item.fontIdx !== undefined) setResolvedFontIdx(item.fontIdx);
+    if (item.logoStyle) setResolvedLogoStyle(item.logoStyle);
+    if (item.gridStyle) setResolvedGridStyle(item.gridStyle);
+    if (item.texture) setResolvedTexture(item.texture);
+
+    if (item.section) {
+      setActiveTab(item.section);
+    }
+
     setStatus('History template loaded.');
     setIsHistoryOpen(false);
     setTimeout(() => setStatus(null), 3000);
@@ -535,6 +550,9 @@ export default function App() {
               companyData={companyData}
               setCompanyData={setCompanyData}
               theme={THEMES[themeIdx]}
+              onSaveHistory={handleSaveHistoryItem}
+              onOpenHistory={() => setIsHistoryOpen(true)}
+              historyCount={historyList.length}
             />
           )}
 
@@ -552,6 +570,9 @@ export default function App() {
                 onDataChange={setCompanyData}
                 uploadedLogo={uploadedLogo}
                 theme={THEMES[themeIdx]}
+                onSaveHistory={handleSaveHistoryItem}
+                onOpenHistory={() => setIsHistoryOpen(true)}
+                historyCount={historyList.length}
               />
             </motion.div>
           )}
@@ -569,6 +590,9 @@ export default function App() {
                 companyData={companyData}
                 setCompanyData={setCompanyData}
                 theme={THEMES[themeIdx]}
+                onSaveHistory={handleSaveHistoryItem}
+                onOpenHistory={() => setIsHistoryOpen(true)}
+                historyCount={historyList.length}
               />
             </motion.div>
           )}

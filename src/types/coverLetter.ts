@@ -12,18 +12,32 @@ export interface CoverLetterFields {
   letterDate: string;
 }
 
-export const DEFAULT_COVER_LETTER_FIELDS: CoverLetterFields = {
-  applicantName: 'Ameer Ali',
+export const DEMO_COVER_LETTER_FIELDS: CoverLetterFields = {
+  applicantName: 'MOHAMMAD NUR HASNAT',
   passportNumber: 'EG0876543',
-  dob: '1992-05-15',
-  companyName: 'Apex Solutions Ltd.',
-  designation: 'Senior Software Engineer',
-  joiningDate: '2021-10-01',
-  patientInfo: 'My father, Mr. Yusuf Ali (Passport: EG0981234)',
-  travelFromDate: '2026-08-10',
-  travelToDate: '2026-08-25',
-  referenceAddress: 'Grand Palace Hotel, 12 Park Street, Kolkata, WB, 700016',
-  letterDate: '2026-07-21',
+  dob: '15/05/1992',
+  companyName: 'Processing Hub',
+  designation: 'Proprietor',
+  joiningDate: '01/10/2021',
+  patientInfo: 'My father, Mr. Abdul Ali (Passport: EG0981234)',
+  travelFromDate: '10/08/2026',
+  travelToDate: '25/08/2026',
+  referenceAddress: 'Grand Palace Hotel, 12 Park Street, Kolkata, WB, 700016, India',
+  letterDate: '25/07/2026',
+};
+
+export const DEFAULT_COVER_LETTER_FIELDS: CoverLetterFields = {
+  applicantName: '',
+  passportNumber: '',
+  dob: '',
+  companyName: '',
+  designation: '',
+  joiningDate: '',
+  patientInfo: '',
+  travelFromDate: '',
+  travelToDate: '',
+  referenceAddress: '',
+  letterDate: '',
 };
 
 export const VISA_CATEGORIES = [

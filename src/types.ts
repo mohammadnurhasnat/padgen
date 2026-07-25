@@ -53,18 +53,37 @@ export interface DesignControls {
   texture: "random" | "none" | "linen" | "vellum" | "canvas" | "watercolor" | "parchment" | "recycled" | "felt" | "laid" | "kraft" | "metallic" | "speckled" | "leather" | "wood";
 }
 
+export type HistorySection = 'designer' | 'cover-letter' | 'id-card' | 'noc';
+
 export interface HistoryItem {
   id: string;
   timestamp: string;
-  type: 'pad-png' | 'card-png' | 'pad-svg' | 'card-svg' | 'pad-pdf' | 'card-pdf' | 'vector-ai' | 'photoshop-psd';
+  section?: HistorySection;
+  title?: string;
+  type: string;
   filename: string;
-  data: CompanyData;
-  theme: Theme;
-  shape: "circle" | "square" | "hexagon" | "shield" | "octagon" | "badge-ribbon" | "waves";
-  padLayout: any;
-  cardLayout: any;
-  fontIdx: number;
-  logoStyle: "classic" | "typographic" | "bordered" | "shadow-badge";
-  gridStyle: "none" | "dots" | "lines" | "repeated-name" | "graph" | "isometric" | "crosses" | "diagonal" | "hexagonal" | "music" | "calligraphy" | "stipple" | "blueprint" | "circuit";
-  texture: "none" | "linen" | "vellum" | "canvas" | "watercolor" | "parchment" | "recycled" | "felt" | "laid" | "kraft" | "metallic" | "speckled" | "leather" | "wood";
+
+  // Pad & Card
+  data?: CompanyData;
+  theme?: Theme;
+  shape?: "circle" | "square" | "hexagon" | "shield" | "octagon" | "badge-ribbon" | "waves";
+  padLayout?: any;
+  cardLayout?: any;
+  fontIdx?: number;
+  logoStyle?: "classic" | "typographic" | "bordered" | "shadow-badge";
+  gridStyle?: "none" | "dots" | "lines" | "repeated-name" | "graph" | "isometric" | "crosses" | "diagonal" | "hexagonal" | "music" | "calligraphy" | "stipple" | "blueprint" | "circuit";
+  texture?: "none" | "linen" | "vellum" | "canvas" | "watercolor" | "parchment" | "recycled" | "felt" | "laid" | "kraft" | "metallic" | "speckled" | "leather" | "wood";
+
+  // Cover Letter
+  coverFields?: any;
+  coverCategory?: string;
+  coverBody?: string;
+
+  // NOC
+  nocFields?: any;
+  nocCategory?: string;
+  nocBody?: string;
+
+  // Job ID Card
+  idOrientation?: 'horizontal' | 'vertical';
 }

@@ -8,12 +8,14 @@ import {
   Briefcase,
   Heart,
   MapPin,
+  History,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { CompanyData, Theme } from '../types';
+import { CompanyData, Theme, HistoryItem } from '../types';
 import {
   CoverLetterFields,
   DEFAULT_COVER_LETTER_FIELDS,
+  DEMO_COVER_LETTER_FIELDS,
   VISA_CATEGORIES,
   VisaCategory,
 } from '../types/coverLetter';
@@ -23,12 +25,18 @@ interface CoverLetterGeneratorProps {
   companyData: CompanyData;
   setCompanyData: React.Dispatch<React.SetStateAction<CompanyData>>;
   theme?: Theme;
+  onSaveHistory?: (item: HistoryItem) => void;
+  onOpenHistory?: () => void;
+  historyCount?: number;
 }
 
 export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
   companyData,
   setCompanyData,
   theme,
+  onSaveHistory,
+  onOpenHistory,
+  historyCount = 0,
 }) => {
   const [coverFields, setCoverFields] = useState<CoverLetterFields>(DEFAULT_COVER_LETTER_FIELDS);
   const [selectedCategory, setSelectedCategory] = useState<VisaCategory>('Tourist Visa');
@@ -85,6 +93,21 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
 
   const handleDownloadPDF = () => {
     generateCoverLetterPDF(coverFields, companyData, letterBody);
+
+    if (onSaveHistory) {
+      const filename = `${coverFields.companyName || companyData.companyName || 'Company'}_Cover_Letter.pdf`;
+      onSaveHistory({
+        id: 'cover-' + Date.now(),
+        timestamp: new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', ''),
+        section: 'cover-letter',
+        title: coverFields.applicantName || coverFields.companyName || companyData.companyName || 'Cover Letter',
+        type: 'cover-letter-pdf',
+        filename: filename,
+        coverFields: { ...coverFields },
+        coverCategory: selectedCategory,
+        coverBody: letterBody,
+      });
+    }
   };
 
   const primaryColor = theme?.primary || '#059669';
@@ -139,27 +162,40 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
 
           <div className="h-4 w-px bg-neutral-200 hidden sm:block mx-1" />
 
+          {onOpenHistory && (
+            <button
+              onClick={onOpenHistory}
+              className="bg-amber-500 hover:bg-amber-400 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5"
+            >
+              <History className="w-3.5 h-3.5" />
+              <span>History</span>
+              {historyCount > 0 && (
+                <span className="bg-white/30 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                  {historyCount}
+                </span>
+              )}
+            </button>
+          )}
+
           {/* Quick-copy and reset templates */}
           <button
             onClick={handleCopyLetterText}
-            className="bg-indigo-600 hover:bg-indigo-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
+            className="bg-indigo-600 hover:bg-indigo-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all"
           >
             {copied ? 'Copied!' : 'Copy Text'}
           </button>
 
           <button
             onClick={handleResetLetter}
-            className="bg-rose-600 hover:bg-rose-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
+            className="bg-rose-600 hover:bg-rose-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all"
             title="Reset back to generated template body"
           >
             Reset
           </button>
 
-          
-
           <button
             onClick={handleDownloadPDF}
-            className="bg-emerald-600 hover:bg-emerald-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer   transition-all"
+            className="bg-emerald-600 hover:bg-emerald-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-4 py-1.5 rounded-lg text-xs cursor-pointer transition-all"
           >
             Download
           </button>
@@ -217,7 +253,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       value={coverFields.applicantName}
                       onChange={(e) => handleCoverFieldChange('applicantName', e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                      placeholder="e.g. Ameer Ali"
+                      placeholder={DEMO_COVER_LETTER_FIELDS.applicantName}
                     />
                   </div>
 
@@ -231,7 +267,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       value={coverFields.passportNumber}
                       onChange={(e) => handleCoverFieldChange('passportNumber', e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                      placeholder="e.g. EG0876543"
+                      placeholder={DEMO_COVER_LETTER_FIELDS.passportNumber}
                     />
                   </div>
                 </div>
@@ -243,9 +279,10 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       Date of Birth
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       value={coverFields.dob}
                       onChange={(e) => handleCoverFieldChange('dob', e.target.value)}
+                      placeholder={DEMO_COVER_LETTER_FIELDS.dob}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
                     />
                   </div>
@@ -256,9 +293,10 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       Letter Date
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       value={coverFields.letterDate}
                       onChange={(e) => handleCoverFieldChange('letterDate', e.target.value)}
+                      placeholder={DEMO_COVER_LETTER_FIELDS.letterDate}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
                     />
                   </div>
@@ -281,7 +319,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       value={coverFields.companyName}
                       onChange={(e) => handleCoverFieldChange('companyName', e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                      placeholder="e.g. Apex Solutions Ltd."
+                      placeholder={DEMO_COVER_LETTER_FIELDS.companyName}
                     />
                   </div>
 
@@ -295,7 +333,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       value={coverFields.designation}
                       onChange={(e) => handleCoverFieldChange('designation', e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                      placeholder="e.g. Lead Developer"
+                      placeholder={DEMO_COVER_LETTER_FIELDS.designation}
                     />
                   </div>
                 </div>
@@ -306,9 +344,10 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                     Joining Date
                   </label>
                   <input
-                    type="date"
+                    type="text"
                     value={coverFields.joiningDate}
                     onChange={(e) => handleCoverFieldChange('joiningDate', e.target.value)}
+                    placeholder={DEMO_COVER_LETTER_FIELDS.joiningDate}
                     className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
                   />
                 </div>
@@ -326,9 +365,10 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       Travel From
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       value={coverFields.travelFromDate}
                       onChange={(e) => handleCoverFieldChange('travelFromDate', e.target.value)}
+                      placeholder={DEMO_COVER_LETTER_FIELDS.travelFromDate}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
                     />
                   </div>
@@ -339,9 +379,10 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       Travel To
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       value={coverFields.travelToDate}
                       onChange={(e) => handleCoverFieldChange('travelToDate', e.target.value)}
+                      placeholder={DEMO_COVER_LETTER_FIELDS.travelToDate}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
                     />
                   </div>
@@ -358,7 +399,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                       value={coverFields.patientInfo}
                       onChange={(e) => handleCoverFieldChange('patientInfo', e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:border-[var(--ui-accent)]"
-                      placeholder="e.g. Yusuf Ali"
+                      placeholder={DEMO_COVER_LETTER_FIELDS.patientInfo}
                     />
                   </div>
                 )}
@@ -373,7 +414,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                     value={coverFields.referenceAddress}
                     onChange={(e) => handleCoverFieldChange('referenceAddress', e.target.value)}
                     className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                    placeholder="e.g. Apollo Gleneagles Hospital, Kolkata"
+                    placeholder={DEMO_COVER_LETTER_FIELDS.referenceAddress}
                   />
                 </div>
               </div>

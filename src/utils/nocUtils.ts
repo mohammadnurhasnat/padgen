@@ -1,38 +1,36 @@
 import { jsPDF } from 'jspdf';
-import { NOCFields, NOCCategory } from '../types/noc';
+import { NOCFields, NOCCategory, DEMO_NOC_FIELDS } from '../types/noc';
 import { Theme } from '../types';
 
 export function formatDateString(dateStr: string): string {
   if (!dateStr) return '';
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   } catch {
     return dateStr;
   }
 }
 
 export function generateNOCText(category: NOCCategory, fields: NOCFields): string {
-  const {
-    refNo,
-    issueDate,
-    companyName,
-    applicantName,
-    gender,
-    designation,
-    passportNo,
-    joiningDate,
-    destinationCountry,
-    leaveFrom,
-    leaveTo,
-    signatoryName,
-    signatoryTitle,
-  } = fields;
+  const refNo = fields.refNo || DEMO_NOC_FIELDS.refNo;
+  const issueDate = fields.issueDate || DEMO_NOC_FIELDS.issueDate;
+  const companyName = fields.companyName || DEMO_NOC_FIELDS.companyName;
+  const applicantName = fields.applicantName || DEMO_NOC_FIELDS.applicantName;
+  const gender = fields.gender || DEMO_NOC_FIELDS.gender;
+  const designation = fields.designation || DEMO_NOC_FIELDS.designation;
+  const passportNo = fields.passportNo || DEMO_NOC_FIELDS.passportNo;
+  const joiningDate = fields.joiningDate || DEMO_NOC_FIELDS.joiningDate;
+  const destinationCountry = fields.destinationCountry || DEMO_NOC_FIELDS.destinationCountry;
+  const leaveFrom = fields.leaveFrom || DEMO_NOC_FIELDS.leaveFrom;
+  const leaveTo = fields.leaveTo || DEMO_NOC_FIELDS.leaveTo;
+  const signatoryName = fields.signatoryName || DEMO_NOC_FIELDS.signatoryName;
+  const signatoryTitle = fields.signatoryTitle || DEMO_NOC_FIELDS.signatoryTitle;
 
   const fIssueDate = formatDateString(issueDate) || '[Issue Date]';
   const fJoiningDate = formatDateString(joiningDate) || '[Joining Date]';
@@ -250,14 +248,21 @@ export function generateNOCPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
   doc.setTextColor(primaryColor);
-  doc.text(fields.companyName.toUpperCase() || 'ACME CORPORATION', 105, 25, { align: 'center' });
+  const companyName = (fields.companyName || DEMO_NOC_FIELDS.companyName).toUpperCase();
+  const companyAddress = fields.companyAddress || DEMO_NOC_FIELDS.companyAddress;
+  const companyPhone = fields.companyPhone || DEMO_NOC_FIELDS.companyPhone;
+  const companyEmail = fields.companyEmail || DEMO_NOC_FIELDS.companyEmail;
+  const refNo = fields.refNo || DEMO_NOC_FIELDS.refNo;
+  const issueDate = fields.issueDate || DEMO_NOC_FIELDS.issueDate;
+
+  doc.text(companyName, 105, 25, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(100, 116, 139);
-  doc.text(fields.companyAddress || '123 Business Avenue, Suite 400', 105, 31, { align: 'center' });
+  doc.text(companyAddress, 105, 31, { align: 'center' });
   doc.text(
-    `Tel: ${fields.companyPhone || '+1 (555) 000-0000'}  |  Email: ${fields.companyEmail || 'info@company.com'}`,
+    `Tel: ${companyPhone}  |  Email: ${companyEmail}`,
     105,
     36,
     { align: 'center' }
@@ -272,9 +277,9 @@ export function generateNOCPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
   doc.setTextColor(51, 65, 85);
-  doc.text(`Ref No: ${fields.refNo || 'NOC/2026/001'}`, 20, 48);
+  doc.text(`Ref No: ${refNo}`, 20, 48);
 
-  const fDate = formatDateString(fields.issueDate);
+  const fDate = formatDateString(issueDate);
   doc.text(`Date: ${fDate}`, 190, 48, { align: 'right' });
 
   // 4. Main Certificate Title (Without TO WHOM IT MAY CONCERN)
