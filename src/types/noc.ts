@@ -49,8 +49,8 @@ export const DEMO_NOC_FIELDS: NOCFields = {
   destinationCountry: 'India',
   leaveFrom: '10/08/2026',
   leaveTo: '25/08/2026',
-  signatoryName: 'Robert Vance',
-  signatoryTitle: 'Head of Human Resources',
+  signatoryName: 'Mohammad Nur Hasnat',
+  signatoryTitle: 'Proprietor',
 };
 
 export const DEFAULT_NOC_FIELDS: NOCFields = {
