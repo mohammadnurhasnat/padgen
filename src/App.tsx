@@ -68,6 +68,7 @@ export default function App() {
   // Download states / History
   const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
+  const [lastLoadedItem, setLastLoadedItem] = useState<HistoryItem | null>(null);
 
   // DOM Refs for image rendering
   const previewPadRef = useRef<HTMLDivElement | null>(null);
@@ -411,6 +412,7 @@ export default function App() {
   };
 
   const handleLoadHistoryItem = (item: HistoryItem) => {
+    setLastLoadedItem(item);
     if (item.data) {
       setCompanyData(item.data);
     }
@@ -531,16 +533,6 @@ export default function App() {
                   onDownloadCardPNG={handleDownloadCardPNG}
                 />
               )}
-
-              <HistoryPanel
-                isOpen={isHistoryOpen}
-                onClose={() => setIsHistoryOpen(false)}
-                historyList={historyList}
-                onLoadItem={handleLoadHistoryItem}
-                onDownloadItemAgain={handleDownloadHistoryItemAgain}
-                onClearHistory={handleClearHistory}
-                onDeleteItem={handleDeleteHistoryItem}
-              />
             </motion.div>
           )}
 
@@ -553,6 +545,7 @@ export default function App() {
               onSaveHistory={handleSaveHistoryItem}
               onOpenHistory={() => setIsHistoryOpen(true)}
               historyCount={historyList.length}
+              lastLoadedItem={lastLoadedItem}
             />
           )}
 
@@ -573,6 +566,7 @@ export default function App() {
                 onSaveHistory={handleSaveHistoryItem}
                 onOpenHistory={() => setIsHistoryOpen(true)}
                 historyCount={historyList.length}
+                lastLoadedItem={lastLoadedItem}
               />
             </motion.div>
           )}
@@ -593,10 +587,22 @@ export default function App() {
                 onSaveHistory={handleSaveHistoryItem}
                 onOpenHistory={() => setIsHistoryOpen(true)}
                 historyCount={historyList.length}
+                lastLoadedItem={lastLoadedItem}
               />
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Global History Panel - visible across all tabs */}
+        <HistoryPanel
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          historyList={historyList}
+          onLoadItem={handleLoadHistoryItem}
+          onDownloadItemAgain={handleDownloadHistoryItemAgain}
+          onClearHistory={handleClearHistory}
+          onDeleteItem={handleDeleteHistoryItem}
+        />
       </main>
     </div>
   );

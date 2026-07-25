@@ -33,6 +33,7 @@ interface NOCGeneratorProps {
   onSaveHistory?: (item: HistoryItem) => void;
   onOpenHistory?: () => void;
   historyCount?: number;
+  lastLoadedItem?: HistoryItem | null;
 }
 
 export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
@@ -42,6 +43,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   onSaveHistory,
   onOpenHistory,
   historyCount = 0,
+  lastLoadedItem,
 }) => {
   const [nocFields, setNocFields] = useState<NOCFields>(DEFAULT_NOC_FIELDS);
   const [selectedCategory, setSelectedCategory] = useState<NOCCategory>('Tourist');
@@ -49,6 +51,18 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   const [isManualEdit, setIsManualEdit] = useState<boolean>(false);
   const [nocMode, setNocMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Restore fields when a history item is loaded
+  useEffect(() => {
+    if (lastLoadedItem && lastLoadedItem.section === 'noc') {
+      if (lastLoadedItem.nocFields) setNocFields(lastLoadedItem.nocFields);
+      if (lastLoadedItem.nocCategory) setSelectedCategory(lastLoadedItem.nocCategory as NOCCategory);
+      if (lastLoadedItem.nocBody) {
+        setNocBody(lastLoadedItem.nocBody);
+        setIsManualEdit(true);
+      }
+    }
+  }, [lastLoadedItem]);
 
   // Auto-generate template text when fields or category change (if not manually edited)
   useEffect(() => {

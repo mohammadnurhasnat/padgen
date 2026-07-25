@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Clock, Download, Trash2, X, ChevronDown, ChevronUp, FileText, Layers, CreditCard, Award } from 'lucide-react';
+import { Clock, Download, Trash2, X, ChevronDown, ChevronUp, FileText, Layers, CreditCard, Award, CheckCircle2 } from 'lucide-react';
 import { HistoryItem, HistorySection } from '../types';
 
 interface HistoryPanelProps {
@@ -11,6 +11,7 @@ interface HistoryPanelProps {
   onDownloadItemAgain: (item: HistoryItem) => void;
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
+  activeSection?: HistorySection;
 }
 
 export const HistoryPanel: React.FC<HistoryPanelProps> = ({
@@ -21,9 +22,16 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onDownloadItemAgain,
   onClearHistory,
   onDeleteItem,
+  activeSection,
 }) => {
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | HistorySection>('all');
+
+  useEffect(() => {
+    if (isOpen && activeSection) {
+      setSelectedFilter(activeSection);
+    }
+  }, [isOpen, activeSection]);
 
   const formatTypeLabel = (item: HistoryItem) => {
     const type = item.type || '';
@@ -112,58 +120,73 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({
                 </button>
               </div>
 
-              {/* Section Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 pt-1 text-[11px]">
-                <button
-                  onClick={() => setSelectedFilter('all')}
-                  className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedFilter === 'all'
-                      ? 'bg-neutral-800 text-white'
-                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                  }`}
-                >
-                  All ({historyList.length})
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('designer')}
-                  className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedFilter === 'designer'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  }`}
-                >
-                  Pad & Card
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('cover-letter')}
-                  className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedFilter === 'cover-letter'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                  }`}
-                >
-                  Cover Letter
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('id-card')}
-                  className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedFilter === 'id-card'
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-teal-50 text-teal-700 hover:bg-teal-100'
-                  }`}
-                >
-                  Job ID
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('noc')}
-                  className={`px-2.5 py-1 rounded-full font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedFilter === 'noc'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                  }`}
-                >
-                  NOC
-                </button>
+              {/* Active Section Indicator & 4 Main Section Buttons in Series */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between text-[11px] font-bold text-neutral-600">
+                  <span>FILTER BY SECTION:</span>
+                  <span className="text-emerald-700 font-extrabold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    Active: {
+                      selectedFilter === 'designer' ? 'Pad & Card' :
+                      selectedFilter === 'cover-letter' ? 'Cover Letter' :
+                      selectedFilter === 'id-card' ? 'Job ID Card' :
+                      selectedFilter === 'noc' ? 'NOC' : 'All Sections'
+                    }
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-5 gap-1.5 text-[11px]">
+                  <button
+                    onClick={() => setSelectedFilter('all')}
+                    className={`py-1.5 px-1 rounded-lg font-bold transition-all cursor-pointer text-center truncate ${
+                      selectedFilter === 'all'
+                        ? 'bg-neutral-900 text-white shadow-xs'
+                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border border-neutral-200/60'
+                    }`}
+                  >
+                    All ({historyList.length})
+                  </button>
+                  <button
+                    onClick={() => setSelectedFilter('designer')}
+                    className={`py-1.5 px-1 rounded-lg font-bold transition-all cursor-pointer text-center truncate ${
+                      selectedFilter === 'designer'
+                        ? 'bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-400'
+                        : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
+                    }`}
+                  >
+                    Pad & Card
+                  </button>
+                  <button
+                    onClick={() => setSelectedFilter('cover-letter')}
+                    className={`py-1.5 px-1 rounded-lg font-bold transition-all cursor-pointer text-center truncate ${
+                      selectedFilter === 'cover-letter'
+                        ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-400'
+                        : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100 border border-indigo-200/60'
+                    }`}
+                  >
+                    Cover Letter
+                  </button>
+                  <button
+                    onClick={() => setSelectedFilter('id-card')}
+                    className={`py-1.5 px-1 rounded-lg font-bold transition-all cursor-pointer text-center truncate ${
+                      selectedFilter === 'id-card'
+                        ? 'bg-teal-600 text-white shadow-xs ring-2 ring-teal-400'
+                        : 'bg-teal-50 text-teal-800 hover:bg-teal-100 border border-teal-200/60'
+                    }`}
+                  >
+                    Job ID Card
+                  </button>
+                  <button
+                    onClick={() => setSelectedFilter('noc')}
+                    className={`py-1.5 px-1 rounded-lg font-bold transition-all cursor-pointer text-center truncate ${
+                      selectedFilter === 'noc'
+                        ? 'bg-amber-600 text-white shadow-xs ring-2 ring-amber-400'
+                        : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60'
+                    }`}
+                  >
+                    NOC
+                  </button>
+                </div>
               </div>
             </div>
 

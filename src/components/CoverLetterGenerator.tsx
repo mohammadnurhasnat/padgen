@@ -28,6 +28,7 @@ interface CoverLetterGeneratorProps {
   onSaveHistory?: (item: HistoryItem) => void;
   onOpenHistory?: () => void;
   historyCount?: number;
+  lastLoadedItem?: HistoryItem | null;
 }
 
 export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
@@ -37,6 +38,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
   onSaveHistory,
   onOpenHistory,
   historyCount = 0,
+  lastLoadedItem,
 }) => {
   const [coverFields, setCoverFields] = useState<CoverLetterFields>(DEFAULT_COVER_LETTER_FIELDS);
   const [selectedCategory, setSelectedCategory] = useState<VisaCategory>('Tourist Visa');
@@ -44,6 +46,18 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
   const [isManualEdit, setIsManualEdit] = useState<boolean>(false);
   const [coverMode, setCoverMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Restore fields when a history item is loaded
+  useEffect(() => {
+    if (lastLoadedItem && lastLoadedItem.section === 'cover-letter') {
+      if (lastLoadedItem.coverFields) setCoverFields(lastLoadedItem.coverFields);
+      if (lastLoadedItem.coverCategory) setSelectedCategory(lastLoadedItem.coverCategory as VisaCategory);
+      if (lastLoadedItem.coverBody) {
+        setLetterBody(lastLoadedItem.coverBody);
+        setIsManualEdit(true);
+      }
+    }
+  }, [lastLoadedItem]);
 
   // Synchronize companyData (Pad & Card section) to coverFields (Cover Letter section)
   useEffect(() => {
