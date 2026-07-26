@@ -94,6 +94,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   const [isManualEdit, setIsManualEdit] = useState<boolean>(false);
   const [nocMode, setNocMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState<boolean>(false);
+  const [padStyle, setPadStyle] = useState<'standard' | 'classic' | 'minimal' | 'right-aligned' | 'professional'>('standard');
 
   // Seal / Stamp states & refs
   const [sealImage, setSealImage] = useState<string | null>(null);
@@ -148,6 +149,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
       if (lastLoadedItem.nocSealImage) setSealImage(lastLoadedItem.nocSealImage);
       if (lastLoadedItem.nocSealPos) setSealPos(lastLoadedItem.nocSealPos);
       if (lastLoadedItem.nocSealSize) setSealSize(lastLoadedItem.nocSealSize);
+      if (lastLoadedItem.nocPadStyle) setPadStyle(lastLoadedItem.nocPadStyle as any);
     }
   }, [lastLoadedItem]);
 
@@ -209,7 +211,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
       containerHeight: docRect?.height || 800,
     } : undefined;
 
-    generateNOCPDF(selectedCategory, nocFields, nocBody, theme, sealData);
+    generateNOCPDF(selectedCategory, nocFields, nocBody, theme, sealData, padStyle);
 
     if (onSaveHistory) {
       const applicantName = nocFields.applicantName || DEMO_NOC_FIELDS.applicantName;
@@ -227,6 +229,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
         nocSealImage: sealImage || undefined,
         nocSealPos: sealPos,
         nocSealSize: sealSize,
+        nocPadStyle: padStyle,
       });
     }
   };
@@ -617,6 +620,35 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             </div>
           </div>
 
+          {/* Pad Style Selector */}
+          <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-neutral-200 shadow-xs space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-500 titlecase tracking-wider block">
+              Pad Style / Format:
+            </label>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+              {[
+                { id: 'standard', label: 'Standard Bar' },
+                { id: 'classic', label: 'Classic Centered' },
+                { id: 'minimal', label: 'Left Minimal' },
+                { id: 'right-aligned', label: 'Right Aligned' },
+                { id: 'professional', label: 'Professional' },
+              ].map((style) => (
+                <button
+                  key={style.id}
+                  type="button"
+                  onClick={() => setPadStyle(style.id as any)}
+                  className={`px-2 py-1.5 text-[10px] font-bold rounded-md border text-center flex items-center justify-center transition-all cursor-pointer ${
+                    padStyle === style.id
+                      ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300'
+                      : 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
+                  }`}
+                >
+                  {style.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Company Seal / Stamp Attachment Card */}
           <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-neutral-200 shadow-xs space-y-2.5">
             <div className="flex items-center justify-between border-b pb-1">
@@ -704,29 +736,92 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
         <div className={`space-y-4 lg:col-span-7 ${nocMode === 'edit' ? 'block' : 'col-span-12'}`}>
           <div
             ref={documentRef}
-            className="bg-white rounded-xl border border-neutral-300 shadow-xl p-8 sm:p-12 min-h-[700px] flex flex-col justify-between relative overflow-hidden font-serif"
+            className={`bg-white rounded-xl border border-neutral-300 shadow-xl p-8 sm:p-12 min-h-[700px] flex flex-col justify-between relative overflow-hidden font-serif ${padStyle === 'standard' || padStyle === 'professional' ? '' : 'pt-12 sm:pt-16'}`}
           >
-            {/* Top Company Pad Accent Bars */}
-            <div
-              className="absolute top-0 left-0 right-0 h-3"
-              style={{ backgroundColor: theme?.primary || '#1E293B' }}
-            />
-            <div
-              className="absolute top-3 left-0 right-0 h-1"
-              style={{ backgroundColor: theme?.accent || '#C5A880' }}
-            />
+            {/* Header Rendering based on padStyle */}
+            {padStyle === 'standard' && (
+              <>
+                <div className="absolute top-0 left-0 right-0 h-3" style={{ backgroundColor: theme?.primary || '#1E293B' }} />
+                <div className="absolute top-3 left-0 right-0 h-1" style={{ backgroundColor: theme?.accent || '#C5A880' }} />
+                <div className="border-b-2 border-neutral-200 pb-5 mb-6 pt-3 select-none text-center">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-sans uppercase m-0 leading-tight" style={{ color: theme?.primary || '#1E293B' }}>
+                    {nocFields.companyName || 'ACME CORPORATION'}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-600 font-sans mt-1 leading-relaxed">
+                    {nocFields.companyAddress || '123 Business Avenue, Suite 400'}
+                    {nocFields.companyPhone ? ` • Tel: ${nocFields.companyPhone}` : ''}
+                    {nocFields.companyEmail ? ` • Email: ${nocFields.companyEmail}` : ''}
+                  </p>
+                </div>
+              </>
+            )}
 
-            {/* Official Company Pad Letterhead Header */}
-            <div className="border-b-2 border-neutral-200 pb-5 mb-6 pt-3 select-none text-center">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 font-sans uppercase m-0 leading-tight">
-                {nocFields.companyName || 'ACME CORPORATION'}
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-600 font-sans mt-1 leading-relaxed">
-                {nocFields.companyAddress || '123 Business Avenue, Suite 400'}
-                {nocFields.companyPhone ? ` • Tel: ${nocFields.companyPhone}` : ''}
-                {nocFields.companyEmail ? ` • Email: ${nocFields.companyEmail}` : ''}
-              </p>
-            </div>
+            {padStyle === 'classic' && (
+               <div className="border-b border-neutral-400 pb-6 mb-6 select-none text-center">
+                  <h1 className="text-3xl font-bold tracking-widest font-serif uppercase m-0 leading-tight" style={{ color: theme?.primary || '#1E293B' }}>
+                    {nocFields.companyName || 'ACME CORPORATION'}
+                  </h1>
+                  <div className="w-16 h-0.5 mx-auto mt-3 mb-2" style={{ backgroundColor: theme?.primary || '#1E293B' }} />
+                  <p className="text-sm text-neutral-700 font-serif leading-relaxed italic">
+                    {nocFields.companyAddress || '123 Business Avenue, Suite 400'}
+                  </p>
+                  <p className="text-xs text-neutral-500 font-serif mt-1">
+                    {nocFields.companyPhone ? `Tel: ${nocFields.companyPhone}` : ''}
+                    {nocFields.companyPhone && nocFields.companyEmail ? ` | ` : ''}
+                    {nocFields.companyEmail ? `Email: ${nocFields.companyEmail}` : ''}
+                  </p>
+                </div>
+            )}
+
+            {padStyle === 'minimal' && (
+                <div className="border-b border-neutral-200 pb-4 mb-6 select-none text-left">
+                  <h1 className="text-2xl font-bold tracking-tight font-sans uppercase m-0 leading-tight" style={{ color: theme?.primary || '#1E293B' }}>
+                    {nocFields.companyName || 'ACME CORPORATION'}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-500 font-sans mt-1 leading-relaxed">
+                    {nocFields.companyAddress || '123 Business Avenue, Suite 400'}
+                  </p>
+                  <p className="text-xs text-neutral-400 font-sans mt-0.5">
+                    {nocFields.companyPhone ? `T: ${nocFields.companyPhone}` : ''}
+                    {nocFields.companyPhone && nocFields.companyEmail ? ` • ` : ''}
+                    {nocFields.companyEmail ? `E: ${nocFields.companyEmail}` : ''}
+                  </p>
+                </div>
+            )}
+
+            {padStyle === 'right-aligned' && (
+                <div className="border-b-2 pb-4 mb-6 select-none text-right flex flex-col items-end" style={{ borderBottomColor: theme?.primary || '#1E293B' }}>
+                  <h1 className="text-2xl font-black tracking-tighter font-sans uppercase m-0 leading-tight" style={{ color: theme?.primary || '#1E293B' }}>
+                    {nocFields.companyName || 'ACME CORPORATION'}
+                  </h1>
+                  <p className="text-sm text-neutral-600 font-sans mt-1 leading-relaxed max-w-sm">
+                    {nocFields.companyAddress || '123 Business Avenue, Suite 400'}
+                  </p>
+                  <p className="text-xs text-neutral-500 font-sans mt-1">
+                    {nocFields.companyPhone ? `P: ${nocFields.companyPhone}` : ''}
+                    {nocFields.companyPhone && nocFields.companyEmail ? ` | ` : ''}
+                    {nocFields.companyEmail ? `E: ${nocFields.companyEmail}` : ''}
+                  </p>
+                </div>
+            )}
+
+            {padStyle === 'professional' && (
+               <>
+                <div className="absolute top-0 left-0 right-0 h-4" style={{ backgroundColor: theme?.primary || '#1E293B' }} />
+                <div className="border-b-4 pb-4 mb-6 pt-6 select-none flex justify-between items-end" style={{ borderBottomColor: theme?.primary || '#1E293B' }}>
+                  <div className="text-left max-w-[60%]">
+                    <h1 className="text-2xl font-bold tracking-normal font-serif uppercase m-0 leading-tight" style={{ color: theme?.primary || '#1E293B' }}>
+                      {nocFields.companyName || 'ACME CORPORATION'}
+                    </h1>
+                  </div>
+                  <div className="text-right text-xs text-neutral-600 font-sans leading-tight space-y-0.5 max-w-[40%]">
+                    <p>{nocFields.companyAddress || '123 Business Avenue, Suite 400'}</p>
+                    <p>{nocFields.companyPhone ? `Phone: ${nocFields.companyPhone}` : ''}</p>
+                    <p>{nocFields.companyEmail ? `Email: ${nocFields.companyEmail}` : ''}</p>
+                  </div>
+                </div>
+               </>
+            )}
 
             {/* Document Content / Live Textarea */}
             <div className="flex-1 space-y-4 relative z-10">
@@ -830,10 +925,27 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             </div>
 
             {/* Bottom Company Pad Footer */}
-            <div
-              className="mt-8 h-3 rounded-b-lg -mx-8 -mb-8 sm:-mx-12 sm:-mb-12"
-              style={{ backgroundColor: theme?.primary || '#1E293B' }}
-            />
+            {(padStyle === 'standard' || padStyle === 'professional') && (
+              <div
+                className="mt-8 h-3 rounded-b-lg -mx-8 -mb-8 sm:-mx-12 sm:-mb-12"
+                style={{ backgroundColor: theme?.primary || '#1E293B' }}
+              />
+            )}
+            {padStyle === 'minimal' && (
+               <div className="mt-8 border-t border-neutral-200 pt-4 text-center text-[10px] text-neutral-400 font-sans uppercase tracking-widest">
+                  {nocFields.companyName || 'ACME CORPORATION'}
+               </div>
+            )}
+            {padStyle === 'classic' && (
+               <div className="mt-8 border-t pt-3 text-center text-xs font-serif italic" style={{ borderTopColor: theme?.primary || '#1E293B', color: theme?.primary || '#1E293B' }}>
+                  End of Document
+               </div>
+            )}
+            {padStyle === 'right-aligned' && (
+               <div className="mt-8 border-t-2 pt-3 text-right text-xs font-sans font-bold" style={{ borderTopColor: theme?.primary || '#1E293B', color: theme?.primary || '#1E293B' }}>
+                  {nocFields.companyName || 'ACME CORPORATION'}
+               </div>
+            )}
           </div>
         </div>
       </div>

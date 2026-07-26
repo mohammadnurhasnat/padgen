@@ -242,7 +242,8 @@ export function generateNOCPDF(
     containerHeight: number;
     signatureImage?: string | null;
     signatureText?: string | null;
-  }
+  },
+  padStyle: 'standard' | 'classic' | 'minimal' | 'right-aligned' | 'professional' = 'standard'
 ) {
   const doc = new jsPDF({
     unit: 'mm',
@@ -256,17 +257,6 @@ export function generateNOCPDF(
   const primaryColor = theme?.primary || '#1E293B';
   const accentColor = theme?.accent || '#C5A880';
 
-  // 1. Top Decorative Brand Bar
-  doc.setFillColor(primaryColor);
-  doc.rect(0, 0, 210, 8, 'F');
-
-  doc.setFillColor(accentColor);
-  doc.rect(0, 8, 210, 1.5, 'F');
-
-  // 2. Company Header Info
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
-  doc.setTextColor(primaryColor);
   const companyName = (fields.companyName || DEMO_NOC_FIELDS.companyName).toUpperCase();
   const companyAddress = fields.companyAddress || DEMO_NOC_FIELDS.companyAddress;
   const companyPhone = fields.companyPhone || DEMO_NOC_FIELDS.companyPhone;
@@ -274,23 +264,99 @@ export function generateNOCPDF(
   const refNo = fields.refNo || DEMO_NOC_FIELDS.refNo;
   const issueDate = fields.issueDate || DEMO_NOC_FIELDS.issueDate;
 
-  doc.text(companyName, 105, 25, { align: 'center' });
+  // Header Rendering based on padStyle
+  if (padStyle === 'standard') {
+    doc.setFillColor(primaryColor);
+    doc.rect(0, 0, 210, 8, 'F');
+    doc.setFillColor(accentColor);
+    doc.rect(0, 8, 210, 1.5, 'F');
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.setTextColor(100, 116, 139);
-  doc.text(companyAddress, 105, 31, { align: 'center' });
-  doc.text(
-    `Tel: ${companyPhone}  |  Email: ${companyEmail}`,
-    105,
-    36,
-    { align: 'center' }
-  );
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 105, 25, { align: 'center' });
 
-  // Horizontal divider
-  doc.setDrawColor(226, 232, 240);
-  doc.setLineWidth(0.6);
-  doc.line(20, 41, 190, 41);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(companyAddress, 105, 31, { align: 'center' });
+    doc.text(`Tel: ${companyPhone}  |  Email: ${companyEmail}`, 105, 36, { align: 'center' });
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.6);
+    doc.line(20, 41, 190, 41);
+  } else if (padStyle === 'classic') {
+    doc.setFont('times', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 105, 25, { align: 'center' });
+
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(0.8);
+    doc.line(95, 28, 115, 28);
+
+    doc.setFont('times', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(51, 65, 85);
+    doc.text(companyAddress, 105, 33, { align: 'center' });
+    doc.setFont('times', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Tel: ${companyPhone} | Email: ${companyEmail}`, 105, 38, { align: 'center' });
+
+    doc.setDrawColor(156, 163, 175);
+    doc.setLineWidth(0.3);
+    doc.line(20, 42, 190, 42);
+  } else if (padStyle === 'minimal') {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 20, 25);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(companyAddress, 20, 31);
+    doc.text(`T: ${companyPhone} • E: ${companyEmail}`, 20, 36);
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(20, 40, 190, 40);
+  } else if (padStyle === 'right-aligned') {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 190, 25, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(companyAddress, 190, 31, { align: 'right' });
+    doc.text(`P: ${companyPhone} | E: ${companyEmail}`, 190, 36, { align: 'right' });
+
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(0.6);
+    doc.line(20, 40, 190, 40);
+  } else if (padStyle === 'professional') {
+    doc.setFillColor(primaryColor);
+    doc.rect(0, 0, 210, 10, 'F');
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 20, 28);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(companyAddress, 190, 24, { align: 'right' });
+    doc.text(`Phone: ${companyPhone}`, 190, 29, { align: 'right' });
+    doc.text(`Email: ${companyEmail}`, 190, 34, { align: 'right' });
+
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(1.2);
+    doc.line(20, 38, 190, 38);
+  }
 
   // 3. Date & Ref Row
   doc.setFont('helvetica', 'bold');
@@ -381,9 +447,35 @@ export function generateNOCPDF(
     }
   }
 
-  // 7. Footer Decorative Bar
-  doc.setFillColor(primaryColor);
-  doc.rect(0, 287, 210, 10, 'F');
+  // 7. Footer Decorative Bar based on padStyle
+  if (padStyle === 'standard' || padStyle === 'professional') {
+    doc.setFillColor(primaryColor);
+    doc.rect(0, 287, 210, 10, 'F');
+  } else if (padStyle === 'minimal') {
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(20, 285, 190, 285);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(156, 163, 175);
+    doc.text(companyName, 105, 290, { align: 'center' });
+  } else if (padStyle === 'classic') {
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(0.3);
+    doc.line(70, 285, 140, 285);
+    doc.setFont('times', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(primaryColor);
+    doc.text('End of Document', 105, 290, { align: 'center' });
+  } else if (padStyle === 'right-aligned') {
+    doc.setDrawColor(primaryColor);
+    doc.setLineWidth(0.6);
+    doc.line(20, 285, 190, 285);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(primaryColor);
+    doc.text(companyName, 190, 290, { align: 'right' });
+  }
 
   // Save PDF with HD Vector Buffer to guarantee >= 200KB ultra-high resolution file size
   const filename = `${fields.applicantName.toLowerCase().replace(/\s+/g, '_')}_noc_certificate.pdf`;

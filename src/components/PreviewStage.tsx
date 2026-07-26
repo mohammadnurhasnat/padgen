@@ -116,7 +116,7 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
           {onBack && (
             <button
               onClick={onBack}
-              className="bg-neutral-800 hover:bg-neutral-900 text-white font-bold px-2.5 py-1.5 rounded-md text-[11px] cursor-pointer border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs transition-all flex items-center gap-1"
+              className="bg-neutral-800 hover:bg-neutral-900 text-white font-bold px-2.5 py-1.5 rounded-md text-[11px] cursor-pointer border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs transition-all flex items-center gap-1 lg:hidden"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
               <span>Back to Edit</span>

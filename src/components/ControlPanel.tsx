@@ -392,7 +392,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
 
         {/* Actions Grid */}
-        <div className="flex flex-col gap-2.5 border-t border-[#DDDEDC] pt-3 pb-6">
+        <div className="flex flex-col gap-2.5 border-t border-[#DDDEDC] pt-3 pb-6 lg:hidden">
           <button
             onClick={onGenerate}
             className="w-full bg-emerald-600 hover:bg-emerald-500  border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-black py-3 px-4 rounded-xl text-[14px] active:translate-y-[2px]  transition-all cursor-pointer flex items-center justify-center gap-2"

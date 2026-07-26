@@ -475,9 +475,9 @@ export default function App() {
             key="designer-view"
             animate={activeTab === 'designer' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
             transition={{ duration: 0.15 }}
-            className="flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden"
+            className="flex flex-col lg:flex-row h-[calc(100vh-65px)] overflow-hidden gap-0 lg:gap-6"
           >
-            {designerStep === 'form' ? (
+            <div className={`${designerStep === 'form' ? 'flex' : 'hidden'} lg:flex w-full lg:w-[400px] xl:w-[450px] shrink-0 h-full overflow-hidden`}>
               <ControlPanel
                 companyData={companyData}
                 onDataChange={setCompanyData}
@@ -507,7 +507,8 @@ export default function App() {
                 uploadedLogoOpacity={uploadedLogoOpacity}
                 onUploadedLogoOpacityChange={setUploadedLogoOpacity}
               />
-            ) : (
+            </div>
+            <div className={`${designerStep === 'preview' ? 'flex' : 'hidden'} lg:flex w-full lg:flex-1 h-full overflow-hidden rounded-xl`}>
               <PreviewStage
                 companyData={companyData}
                 theme={THEMES[themeIdx]}
@@ -531,7 +532,7 @@ export default function App() {
                 onDownloadPadPNG={handleDownloadPadPNG}
                 onDownloadCardPNG={handleDownloadCardPNG}
               />
-            )}
+            </div>
           </motion.div>
         </div>
 
