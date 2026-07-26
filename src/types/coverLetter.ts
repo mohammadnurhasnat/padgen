@@ -10,6 +10,12 @@ export interface CoverLetterFields {
   travelToDate: string;
   referenceAddress: string;
   letterDate: string;
+  indianBusinessName?: string;
+  indianBusinessAddress?: string;
+  medicalHospitalName?: string;
+  medicalHospitalAddress?: string;
+  medicalDepartment?: string;
+  delhiEmbassyName?: string;
 }
 
 export const DEMO_COVER_LETTER_FIELDS: CoverLetterFields = {
@@ -24,6 +30,12 @@ export const DEMO_COVER_LETTER_FIELDS: CoverLetterFields = {
   travelToDate: '25/08/2026',
   referenceAddress: 'Grand Palace Hotel, 12 Park Street, Kolkata, WB, 700016, India',
   letterDate: '25/07/2026',
+  indianBusinessName: 'Reliance Industries Limited',
+  indianBusinessAddress: 'Maker Chambers IV, 222 Nariman Point, Mumbai, Maharashtra 400021, India',
+  medicalHospitalName: 'Apollo Hospitals Chennai',
+  medicalHospitalAddress: '21 Greams Lane, Off Greams Road, Chennai, Tamil Nadu 600006, India',
+  medicalDepartment: 'Cardiology',
+  delhiEmbassyName: 'Embassy of the United States',
 };
 
 export const DEFAULT_COVER_LETTER_FIELDS: CoverLetterFields = {
@@ -38,6 +50,12 @@ export const DEFAULT_COVER_LETTER_FIELDS: CoverLetterFields = {
   travelToDate: '',
   referenceAddress: '',
   letterDate: '',
+  indianBusinessName: '',
+  indianBusinessAddress: '',
+  medicalHospitalName: '',
+  medicalHospitalAddress: '',
+  medicalDepartment: '',
+  delhiEmbassyName: '',
 };
 
 export const VISA_CATEGORIES = [

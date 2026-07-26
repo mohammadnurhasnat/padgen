@@ -211,24 +211,6 @@ export const PreviewStage: React.FC<PreviewStageProps> = ({
               <span>Card PDF</span>
             </button>
           )}
-          {onDownloadPadPNG && (
-            <button
-              onClick={onDownloadPadPNG}
-              className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
-            >
-              <Download className="w-3 h-3" />
-              <span>Pad PNG</span>
-            </button>
-          )}
-          {onDownloadCardPNG && (
-            <button
-              onClick={onDownloadCardPNG}
-              className="bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold px-2 py-1.5 rounded-md text-[11px] cursor-pointer transition-all flex items-center gap-1 border-b-[2px] border-black/20 active:border-b-0 active:translate-y-[2px] shadow-xs"
-            >
-              <Download className="w-3 h-3" />
-              <span>Card PNG</span>
-            </button>
-          )}
         </div>
       </div>
 

@@ -469,78 +469,113 @@ export default function App() {
 
       {/* Main Workspace Area */}
       <main className="w-full px-2 sm:px-4 md:px-6 py-1 print:py-0">
-        <AnimatePresence mode="wait">
-          {/* TAB 1: PAD & CARD DESIGNER */}
-          {activeTab === 'designer' && (
-            <motion.div
-              key="designer-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-              className="flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden"
-            >
-              {designerStep === 'form' ? (
-                <ControlPanel
-                  companyData={companyData}
-                  onDataChange={setCompanyData}
-                  controls={controls}
-                  onControlsChange={setControls}
-                  onGenerate={handleGenerateDesigner}
-                  onRandomTheme={handleRandomTheme}
-                  onResetAll={handleResetInputs}
-                  onDownloadPadPDF={handleDownloadPadPDF}
-                  onDownloadCardPDF={handleDownloadCardPDF}
-                  onExportCardSVG={handleExportCardSVG}
-                  onExportPadSVG={handleExportPadSVG}
-                  onDownloadCardPNG={handleDownloadCardPNG}
-                  onDownloadPadPNG={handleDownloadPadPNG}
-                  onExportAI={handleExportAI}
-                  onExportPSD={handleExportPSD}
-                  onSaveTemplate={handleSaveLocalTemplate}
-                  onLoadTemplate={handleLoadLocalTemplate}
-                  error={error}
-                  status={status}
-                  onOpenHistory={() => setIsHistoryOpen(true)}
-                  historyCount={historyList.length}
-                  uploadedLogo={uploadedLogo}
-                  onUploadedLogoChange={setUploadedLogo}
-                  uploadedLogoSize={uploadedLogoSize}
-                  onUploadedLogoSizeChange={setUploadedLogoSize}
-                  uploadedLogoOpacity={uploadedLogoOpacity}
-                  onUploadedLogoOpacityChange={setUploadedLogoOpacity}
-                />
-              ) : (
-                <PreviewStage
-                  companyData={companyData}
-                  theme={THEMES[themeIdx]}
-                  shape={resolvedShape}
-                  padLayout={resolvedPadLayout}
-                  cardLayout={resolvedCardLayout}
-                  headlineFont={HEADLINE_FONTS[resolvedFontIdx].stack}
-                  logoStyle={resolvedLogoStyle}
-                  gridStyle={resolvedGridStyle}
-                  texture={resolvedTexture}
-                  previewPadRef={previewPadRef}
-                  previewCardRef={previewCardRef}
-                  uploadedLogo={uploadedLogo}
-                  uploadedLogoSize={uploadedLogoSize}
-                  uploadedLogoOpacity={uploadedLogoOpacity}
-                  onUpdateStyle={handleUpdateStyle}
-                  onBack={() => setDesignerStep('form')}
-                  onRedesign={handleGenerateDesigner}
-                  onDownloadPadPDF={handleDownloadPadPDF}
-                  onDownloadCardPDF={handleDownloadCardPDF}
-                  onDownloadPadPNG={handleDownloadPadPNG}
-                  onDownloadCardPNG={handleDownloadCardPNG}
-                />
-              )}
-            </motion.div>
-          )}
+        {/* TAB 1: PAD & CARD DESIGNER */}
+        <div className={activeTab === 'designer' ? 'block' : 'hidden'}>
+          <motion.div
+            key="designer-view"
+            animate={activeTab === 'designer' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden"
+          >
+            {designerStep === 'form' ? (
+              <ControlPanel
+                companyData={companyData}
+                onDataChange={setCompanyData}
+                controls={controls}
+                onControlsChange={setControls}
+                onGenerate={handleGenerateDesigner}
+                onRandomTheme={handleRandomTheme}
+                onResetAll={handleResetInputs}
+                onDownloadPadPDF={handleDownloadPadPDF}
+                onDownloadCardPDF={handleDownloadCardPDF}
+                onExportCardSVG={handleExportCardSVG}
+                onExportPadSVG={handleExportPadSVG}
+                onDownloadCardPNG={handleDownloadCardPNG}
+                onDownloadPadPNG={handleDownloadPadPNG}
+                onExportAI={handleExportAI}
+                onExportPSD={handleExportPSD}
+                onSaveTemplate={handleSaveLocalTemplate}
+                onLoadTemplate={handleLoadLocalTemplate}
+                error={error}
+                status={status}
+                onOpenHistory={() => setIsHistoryOpen(true)}
+                historyCount={historyList.length}
+                uploadedLogo={uploadedLogo}
+                onUploadedLogoChange={setUploadedLogo}
+                uploadedLogoSize={uploadedLogoSize}
+                onUploadedLogoSizeChange={setUploadedLogoSize}
+                uploadedLogoOpacity={uploadedLogoOpacity}
+                onUploadedLogoOpacityChange={setUploadedLogoOpacity}
+              />
+            ) : (
+              <PreviewStage
+                companyData={companyData}
+                theme={THEMES[themeIdx]}
+                shape={resolvedShape}
+                padLayout={resolvedPadLayout}
+                cardLayout={resolvedCardLayout}
+                headlineFont={HEADLINE_FONTS[resolvedFontIdx].stack}
+                logoStyle={resolvedLogoStyle}
+                gridStyle={resolvedGridStyle}
+                texture={resolvedTexture}
+                previewPadRef={previewPadRef}
+                previewCardRef={previewCardRef}
+                uploadedLogo={uploadedLogo}
+                uploadedLogoSize={uploadedLogoSize}
+                uploadedLogoOpacity={uploadedLogoOpacity}
+                onUpdateStyle={handleUpdateStyle}
+                onBack={() => setDesignerStep('form')}
+                onRedesign={handleGenerateDesigner}
+                onDownloadPadPDF={handleDownloadPadPDF}
+                onDownloadCardPDF={handleDownloadCardPDF}
+                onDownloadPadPNG={handleDownloadPadPNG}
+                onDownloadCardPNG={handleDownloadCardPNG}
+              />
+            )}
+          </motion.div>
+        </div>
 
-          {/* TAB 2: COVER LETTER GENERATOR */}
-          {activeTab === 'cover-letter' && (
-            <CoverLetterGenerator
+        {/* TAB 2: COVER LETTER GENERATOR */}
+        <div className={activeTab === 'cover-letter' ? 'block' : 'hidden'}>
+          <CoverLetterGenerator
+            companyData={companyData}
+            setCompanyData={setCompanyData}
+            theme={THEMES[themeIdx]}
+            onSaveHistory={handleSaveHistoryItem}
+            onOpenHistory={() => setIsHistoryOpen(true)}
+            historyCount={historyList.length}
+            lastLoadedItem={lastLoadedItem}
+          />
+        </div>
+
+        {/* TAB 3: Job ID Card Generator */}
+        <div className={activeTab === 'id-card' ? 'block' : 'hidden'}>
+          <motion.div
+            key="id-card-view"
+            animate={activeTab === 'id-card' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: 0.15 }}
+          >
+            <JobIDCard
+              companyData={companyData}
+              onDataChange={setCompanyData}
+              uploadedLogo={uploadedLogo}
+              theme={THEMES[themeIdx]}
+              onSaveHistory={handleSaveHistoryItem}
+              onOpenHistory={() => setIsHistoryOpen(true)}
+              historyCount={historyList.length}
+              lastLoadedItem={lastLoadedItem}
+            />
+          </motion.div>
+        </div>
+
+        {/* TAB 4: NOC Generator */}
+        <div className={activeTab === 'noc' ? 'block' : 'hidden'}>
+          <motion.div
+            key="noc-view"
+            animate={activeTab === 'noc' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: 0.15 }}
+          >
+            <NOCGenerator
               companyData={companyData}
               setCompanyData={setCompanyData}
               theme={THEMES[themeIdx]}
@@ -548,74 +583,29 @@ export default function App() {
               onOpenHistory={() => setIsHistoryOpen(true)}
               historyCount={historyList.length}
               lastLoadedItem={lastLoadedItem}
+              externalSealImage={attachedSealImage}
             />
-          )}
+          </motion.div>
+        </div>
 
-          {/* TAB 3: Job ID Card Generator */}
-          {activeTab === 'id-card' && (
-            <motion.div
-              key="id-card-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-            >
-              <JobIDCard
-                companyData={companyData}
-                onDataChange={setCompanyData}
-                uploadedLogo={uploadedLogo}
-                theme={THEMES[themeIdx]}
-                onSaveHistory={handleSaveHistoryItem}
-                onOpenHistory={() => setIsHistoryOpen(true)}
-                historyCount={historyList.length}
-                lastLoadedItem={lastLoadedItem}
-              />
-            </motion.div>
-          )}
-
-          {/* TAB 4: NOC Generator */}
-          {activeTab === 'noc' && (
-            <motion.div
-              key="noc-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-            >
-              <NOCGenerator
-                companyData={companyData}
-                setCompanyData={setCompanyData}
-                theme={THEMES[themeIdx]}
-                onSaveHistory={handleSaveHistoryItem}
-                onOpenHistory={() => setIsHistoryOpen(true)}
-                historyCount={historyList.length}
-                lastLoadedItem={lastLoadedItem}
-                externalSealImage={attachedSealImage}
-              />
-            </motion.div>
-          )}
-
-          {/* TAB 5: Digital Seal Generator */}
-          {activeTab === 'seal' && (
-            <motion.div
-              key="seal-view"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
-            >
-              <DigitalSealGenerator
-                companyData={companyData}
-                onOpenHistory={() => setIsHistoryOpen(true)}
-                historyCount={historyList.length}
-                onApplyToNOC={(sealUrl) => {
-                  setAttachedSealImage(sealUrl);
-                  setActiveTab('noc');
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* TAB 5: Digital Seal Generator */}
+        <div className={activeTab === 'seal' ? 'block' : 'hidden'}>
+          <motion.div
+            key="seal-view"
+            animate={activeTab === 'seal' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: 0.15 }}
+          >
+            <DigitalSealGenerator
+              companyData={companyData}
+              onOpenHistory={() => setIsHistoryOpen(true)}
+              historyCount={historyList.length}
+              onApplyToNOC={(sealUrl) => {
+                setAttachedSealImage(sealUrl);
+                setActiveTab('noc');
+              }}
+            />
+          </motion.div>
+        </div>
 
         {/* Global History Panel - visible across all tabs */}
         <HistoryPanel

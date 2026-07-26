@@ -432,6 +432,8 @@ export const DEMO_COMPANY_DATA: CompanyData = {
   empPhone: "+8801861186863",
   empEmail: "mohammadnurhasnat@gmail.com",
   empIdNumber: "PH-88026",
+  empValidity: "DEC 2028",
+  authSignature: "",
   casing: 'title',
   industry: 'corporate',
 };
@@ -447,6 +449,8 @@ export const DEFAULT_COMPANY_DATA: CompanyData = {
   empPhone: "",
   empEmail: "",
   empIdNumber: "",
+  empValidity: "DEC 2028",
+  authSignature: "",
   casing: 'title',
   industry: 'corporate',
 };

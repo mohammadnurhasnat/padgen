@@ -81,57 +81,64 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
         {/* TAB CONTROL TOGGLES */}
         <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center justify-between sm:justify-end gap-2.5">
           <div className="w-full sm:w-auto">
-            <div className="grid grid-cols-2 sm:flex items-center justify-center p-1 rounded-[10px] bg-neutral-100 border border-neutral-200 gap-1.5 w-full sm:w-auto">
-              <button
-                onClick={() => onTabChange('designer')}
-                className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                  activeTab === 'designer'
-                    ? 'bg-emerald-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-emerald-400 ring-offset-1'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                }`}
-              >
-                Pad & Card
-              </button>
-              <button
-                onClick={() => onTabChange('cover-letter')}
-                className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                  activeTab === 'cover-letter'
-                    ? 'bg-indigo-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-indigo-400 ring-offset-1'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                }`}
-              >
-                Cover Letter
-              </button>
-              <button
-                onClick={() => onTabChange('id-card')}
-                className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                  activeTab === 'id-card'
-                    ? 'bg-teal-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-teal-400 ring-offset-1'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                }`}
-              >
-                Job ID Card
-              </button>
-              <button
-                onClick={() => onTabChange('noc')}
-                className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                  activeTab === 'noc'
-                    ? 'bg-amber-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-amber-400 ring-offset-1'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                }`}
-              >
-                NOC
-              </button>
-              <button
-                onClick={() => onTabChange('seal')}
-                className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                  activeTab === 'seal'
-                    ? 'bg-purple-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-purple-400 ring-offset-1'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                }`}
-              >
-                Seal Generator
-              </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center p-1 rounded-[10px] bg-neutral-100 border border-neutral-200 gap-1.5 w-full sm:w-auto">
+              {/* Row 1 on Mobile: Pad & Card, Cover Letter */}
+              <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
+                <button
+                  onClick={() => onTabChange('designer')}
+                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
+                    activeTab === 'designer'
+                      ? 'bg-emerald-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-emerald-400 ring-offset-1'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
+                  }`}
+                >
+                  Pad & Card
+                </button>
+                <button
+                  onClick={() => onTabChange('cover-letter')}
+                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
+                    activeTab === 'cover-letter'
+                      ? 'bg-indigo-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-indigo-400 ring-offset-1'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
+                  }`}
+                >
+                  Cover Letter
+                </button>
+              </div>
+
+              {/* Row 2 on Mobile: Job ID, Seal, NOC */}
+              <div className="grid grid-cols-3 sm:flex items-center gap-1.5 w-full sm:w-auto">
+                <button
+                  onClick={() => onTabChange('id-card')}
+                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
+                    activeTab === 'id-card'
+                      ? 'bg-teal-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-teal-400 ring-offset-1'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
+                  }`}
+                >
+                  Job ID
+                </button>
+                <button
+                  onClick={() => onTabChange('seal')}
+                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
+                    activeTab === 'seal'
+                      ? 'bg-purple-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-purple-400 ring-offset-1'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
+                  }`}
+                >
+                  Seal
+                </button>
+                <button
+                  onClick={() => onTabChange('noc')}
+                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
+                    activeTab === 'noc'
+                      ? 'bg-amber-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-amber-400 ring-offset-1'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
+                  }`}
+                >
+                  NOC
+                </button>
+              </div>
             </div>
           </div>
 

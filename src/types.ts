@@ -10,6 +10,8 @@ export interface CompanyData {
   empEmail?: string;
   empPhoto?: string;
   empIdNumber?: string;
+  empValidity?: string;
+  authSignature?: string;
   casing?: 'title' | 'upper' | 'as-typed';
   industry?: 'corporate' | 'legal' | 'medical' | 'creative' | 'hospitality';
 }

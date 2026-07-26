@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 import * as htmlToImage from 'html-to-image';
 import { CompanyData, Theme, HistoryItem } from '../types';
 import { DEMO_COMPANY_DATA } from '../data';
-import { Sparkles, ArrowLeft, Download, History, Palette, Sliders, Check, Maximize2, RefreshCw } from 'lucide-react';
+import { Sparkles, ArrowLeft, Download, History, Palette, Sliders, Check, Maximize2, RefreshCw, Upload } from 'lucide-react';
 
 interface JobIDCardProps {
   companyData: CompanyData;
@@ -36,6 +36,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
   lastLoadedItem,
 }) => {
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const signatureInputRef = useRef<HTMLInputElement>(null);
   const frontCardRef = useRef<HTMLDivElement>(null);
   const backCardRef = useRef<HTMLDivElement>(null);
 
@@ -45,11 +46,89 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
   const [step, setStep] = useState<'form' | 'preview'>('form');
   const [previewScale, setPreviewScale] = useState(0.5);
 
+  // Signature states & refs
+  const [signatureNameInput, setSignatureNameInput] = useState<string>('Md. Mizanur Rahman');
+  const [generatedSigDataUrl, setGeneratedSigDataUrl] = useState<string | null>(null);
+
+  // Automatically generate signature in real-time as signatureNameInput is typed!
+  useEffect(() => {
+    const name = signatureNameInput || '';
+    if (!name.trim()) {
+      setGeneratedSigDataUrl(null);
+      return;
+    }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Set elegant cursive font (Alex Brush or Dancing Script)
+      ctx.font = "italic 44px 'Dancing Script', 'Alex Brush', cursive";
+      ctx.fillStyle = "rgb(30, 41, 150)"; // Royal blue ink
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      
+      // Subtle ink shadow
+      ctx.shadowColor = "rgba(30, 41, 150, 0.15)";
+      ctx.shadowBlur = 1;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 1;
+      
+      ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+      
+      const url = canvas.toDataURL('image/png');
+      setGeneratedSigDataUrl(url);
+    }
+  }, [signatureNameInput]);
+
+  const downloadGeneratedSignature = () => {
+    let url = generatedSigDataUrl;
+    if (!url) {
+      const name = signatureNameInput || 'Authorized';
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 120;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = "italic 44px 'Dancing Script', 'Alex Brush', cursive";
+        ctx.fillStyle = "rgb(30, 41, 150)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+        
+        url = canvas.toDataURL('image/png');
+        setGeneratedSigDataUrl(url);
+      }
+    }
+
+    if (url) {
+      const link = document.createElement('a');
+      const filename = (signatureNameInput || 'Authorized').toLowerCase().replace(/\s+/g, '_');
+      link.download = `${filename}_signature.png`;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   // Restore fields when a history item is loaded
   useEffect(() => {
     if (lastLoadedItem && lastLoadedItem.section === 'id-card') {
       if (lastLoadedItem.idOrientation) setOrientation(lastLoadedItem.idOrientation);
-      if (lastLoadedItem.data) onDataChange(lastLoadedItem.data);
+      if (lastLoadedItem.data) {
+        onDataChange(lastLoadedItem.data);
+        if (lastLoadedItem.data.authSignature && !lastLoadedItem.data.authSignature.startsWith('data:image')) {
+          setSignatureNameInput(lastLoadedItem.data.authSignature);
+        } else if (lastLoadedItem.data.empName) {
+          setSignatureNameInput(lastLoadedItem.data.empName);
+        }
+      }
       setStep('preview');
     }
   }, [lastLoadedItem]);
@@ -73,10 +152,12 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
   }, []);
 
   const handleFieldChange = (field: keyof CompanyData, value: string) => {
-    onDataChange({
+    const updatedData: CompanyData = {
       ...companyData,
       [field]: value,
-    });
+    };
+
+    onDataChange(updatedData);
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +170,19 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
           // Default normal photo placement on upload
           setPhotoFitMode('contain');
           setPhotoAutoEnhanced(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        if (evt.target?.result) {
+          handleFieldChange('authSignature', evt.target.result as string);
         }
       };
       reader.readAsDataURL(file);
@@ -249,6 +343,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs pt-1">
+            {/* Company Name */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Company Name</label>
               <input
@@ -260,6 +355,43 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
+            {/* Company Phone Number */}
+            <div className="flex flex-col gap-1">
+              <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Company Phone Number</label>
+              <input
+                type="text"
+                value={companyData.phone || ''}
+                onChange={(e) => handleFieldChange('phone', e.target.value)}
+                placeholder={DEMO_COMPANY_DATA.phone}
+                className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Company Email Address */}
+            <div className="flex flex-col gap-1">
+              <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Company Email Address</label>
+              <input
+                type="email"
+                value={companyData.email || ''}
+                onChange={(e) => handleFieldChange('email', e.target.value)}
+                placeholder={DEMO_COMPANY_DATA.email}
+                className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Company Address */}
+            <div className="flex flex-col gap-1">
+              <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Company Address</label>
+              <input
+                type="text"
+                value={companyData.address || ''}
+                onChange={(e) => handleFieldChange('address', e.target.value)}
+                placeholder={DEMO_COMPANY_DATA.address}
+                className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Employee Name */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Employee Name</label>
               <input
@@ -271,6 +403,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
+            {/* Designation */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Designation</label>
               <input
@@ -282,6 +415,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
+            {/* ID / Badge Number */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">ID / Badge Number</label>
               <input
@@ -293,6 +427,19 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
+            {/* Job ID Card Validity */}
+            <div className="flex flex-col gap-1">
+              <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Job ID Card Validity</label>
+              <input
+                type="text"
+                value={companyData.empValidity || ''}
+                onChange={(e) => handleFieldChange('empValidity', e.target.value)}
+                placeholder="e.g. DEC 2028"
+                className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Employee Mobile */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Employee Mobile</label>
               <input
@@ -304,6 +451,7 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
+            {/* Employee Email */}
             <div className="flex flex-col gap-1">
               <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Employee Email</label>
               <input
@@ -315,17 +463,139 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
               />
             </div>
 
-            <div className="flex flex-col gap-1 sm:col-span-2">
-              <label className="font-mono text-[10px] text-neutral-500 uppercase font-bold">Company Address</label>
+            {/* Authorized Signature Studio */}
+            <div className="flex flex-col gap-2 sm:col-span-2 bg-emerald-50/20 p-3.5 rounded-xl border border-emerald-100/50">
+              <label className="font-mono text-[10px] text-emerald-950 uppercase font-black tracking-wider block">
+                Authorized Signature Studio (স্বাক্ষর স্টুডিও)
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Part 1: Signatory Name Input */}
+                <div className="space-y-1.5 bg-white p-2.5 rounded-lg border border-neutral-200 shadow-3xs flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold flex items-center justify-center">1</span>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                        Signatory Name (নাম)
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      value={signatureNameInput}
+                      onChange={(e) => {
+                        setSignatureNameInput(e.target.value);
+                        if (!companyData.authSignature?.startsWith('data:image')) {
+                          handleFieldChange('authSignature', e.target.value);
+                        }
+                      }}
+                      placeholder="e.g. Md Mizanur Rahman"
+                      className="w-full text-xs px-2.5 py-1.5 border border-neutral-200 bg-neutral-50/50 rounded-md focus:ring-2 focus:ring-emerald-400 focus:bg-white outline-none font-bold text-neutral-800 transition-all shadow-3xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Part 2: Initial Signature Display */}
+                <div className="space-y-1.5 bg-white p-2.5 rounded-lg border border-neutral-200 shadow-3xs flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold flex items-center justify-center">2</span>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                        Signature Preview (স্বাক্ষর)
+                      </label>
+                    </div>
+                    <div className="h-14 border border-dashed border-neutral-200 rounded-md bg-neutral-50 flex items-center justify-center relative overflow-hidden select-none">
+                      {generatedSigDataUrl ? (
+                        <img src={generatedSigDataUrl} alt="Generated Signature" className="max-h-[85%] object-contain" />
+                      ) : signatureNameInput ? (
+                        <div className="text-center">
+                          <span
+                            className="text-indigo-800 font-bold whitespace-nowrap select-none italic block"
+                            style={{
+                              fontSize: '20px',
+                              fontFamily: "'Dancing Script', 'Alex Brush', cursive",
+                              transform: 'rotate(-2deg)',
+                            }}
+                          >
+                            {signatureNameInput}
+                          </span>
+                          <span className="text-[7.5px] text-neutral-400 font-bold uppercase mt-0.5 block tracking-widest">
+                            Initial Live Preview
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-neutral-400 font-medium italic">
+                          Enter a name
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Part 3: Signature Actions (Download) */}
+                <div className="space-y-1.5 bg-white p-2.5 rounded-lg border border-neutral-200 shadow-3xs flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold flex items-center justify-center">3</span>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                        Actions (ডাউনলোড)
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={downloadGeneratedSignature}
+                      disabled={!signatureNameInput}
+                      className="w-full py-1.5 px-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed text-indigo-700 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
+                      title="Download Initial Signature as Transparent PNG"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download Signature</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Part 4: Upload Signature */}
+                <div className="space-y-1.5 bg-white p-2.5 rounded-lg border border-neutral-200 shadow-3xs flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-extrabold flex items-center justify-center">4</span>
+                      <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">
+                        Upload Signature (আপলোড)
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => signatureInputRef.current?.click()}
+                      className="w-full py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 group shadow-3xs"
+                      title="Upload custom signature image file"
+                    >
+                      <Upload className="w-3.5 h-3.5 group-hover:scale-105 transition-transform" />
+                      <span>Upload Signature</span>
+                    </button>
+                  </div>
+
+                  {companyData.authSignature && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleFieldChange('authSignature', '');
+                      }}
+                      className="w-full text-center text-rose-600 hover:text-rose-700 text-[9px] font-extrabold transition-all cursor-pointer uppercase tracking-wider mt-1"
+                    >
+                      Clear Signature
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <input
-                type="text"
-                value={companyData.address || ''}
-                onChange={(e) => handleFieldChange('address', e.target.value)}
-                placeholder={DEMO_COMPANY_DATA.address}
-                className="p-2 border border-neutral-200 rounded-lg bg-neutral-50 font-bold text-neutral-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                ref={signatureInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleSignatureUpload}
               />
             </div>
-          </div>
+            </div>
 
           <div className="flex justify-end pt-4 border-t border-neutral-100 mt-2">
             <button
@@ -887,11 +1157,25 @@ export const JobIDCard: React.FC<JobIDCardProps> = ({
                   <div className="flex items-end justify-between px-4 pt-1">
                     <div className="text-left">
                       <span className="text-[8px] text-neutral-400 font-bold block">VALID THRU</span>
-                      <span className="text-[9.5px] font-bold text-neutral-800">DEC 2028</span>
+                      <span className="text-[9.5px] font-bold text-neutral-800">
+                        {companyData.empValidity || DEMO_COMPANY_DATA.empValidity || 'DEC 2028'}
+                      </span>
                     </div>
                     <div className="flex flex-col items-center">
-                      <div className="w-28 border-b border-neutral-900 pb-0.5 text-center font-serif text-[11px] italic font-bold text-neutral-900">
-                        {companyData.empName ? companyData.empName.split(' ')[0] : 'Authorized'}
+                      <div className="w-32 border-b border-neutral-900 pb-0.5 flex items-end justify-center min-h-[22px]">
+                        {(companyData.authSignature || '').startsWith('data:image') || (companyData.authSignature || '').startsWith('http') ? (
+                          <img src={companyData.authSignature} alt="Signature" className="max-h-6 object-contain" />
+                        ) : generatedSigDataUrl ? (
+                          <img src={generatedSigDataUrl} alt="Signature" className="max-h-6 object-contain" />
+                        ) : companyData.authSignature ? (
+                          <span className="font-serif text-[11px] italic font-bold text-neutral-900 truncate max-w-[125px]">
+                            {companyData.authSignature}
+                          </span>
+                        ) : (
+                          <span className="font-serif text-[11px] italic font-bold text-neutral-900 truncate max-w-[125px]">
+                            Authorized
+                          </span>
+                        )}
                       </div>
                       <span className="text-[8px] font-black uppercase text-neutral-500 mt-0.5">AUTHORIZED SIGNATURE</span>
                     </div>

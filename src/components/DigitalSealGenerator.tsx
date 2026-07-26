@@ -12,7 +12,6 @@ import {
   Building,
   Briefcase,
   Copy,
-  RefreshCw,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { CompanyData } from '../types';
@@ -257,22 +256,9 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
           <div className="space-y-1.5">
             
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Digital Seal & Rubber Stamp Generator
+              Seal Generator
             </h2>
-            <p className="text-xs sm:text-sm text-purple-200 max-w-2xl leading-relaxed">
-              Generate official company seals with realistic ink texture & angle tilt. Download transparent PNG or attach directly to your NOC documents.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setSeed((s) => s + 1)}
-              className="px-3.5 py-2 bg-purple-800/60 hover:bg-purple-700 text-purple-100 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border border-purple-600/40 cursor-pointer"
-              title="Regenerate random ink texture"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-purple-300" />
-              <span>Re-Stamp Texture</span>
-            </button>
+           
           </div>
         </div>
       </div>
@@ -281,12 +267,7 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Form Controls (5 cols) */}
         <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-neutral-100">
-            <Sliders className="w-4 h-4 text-purple-600" />
-            <h3 className="text-xs font-extrabold text-neutral-800 uppercase tracking-wider">
-              Seal Information & Controls
-            </h3>
-          </div>
+          
 
           {/* Company Name Input */}
           <div className="space-y-1.5">

@@ -22,6 +22,7 @@ import {
   ZoomOut,
   ShieldCheck,
   Scaling,
+  Sparkles,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { CompanyData, Theme, HistoryItem } from '../types';
@@ -33,6 +34,38 @@ import {
   NOCCategory,
 } from '../types/noc';
 import { generateNOCText, generateNOCPDF, formatDateString } from '../utils/nocUtils';
+
+const splitNocBody = (body: string) => {
+  const lowercaseBody = body.toLowerCase();
+  const markers = [
+    'sincerely,',
+    'sincerely',
+    'regards,',
+    'regards',
+    'yours truly,',
+    'yours truly',
+    'best regards,',
+    'best regards',
+    'faithfully,',
+    'faithfully'
+  ];
+  
+  let splitIndex = -1;
+  for (const marker of markers) {
+    const idx = lowercaseBody.lastIndexOf(marker);
+    if (idx !== -1 && idx > splitIndex) {
+      splitIndex = idx;
+    }
+  }
+  
+  if (splitIndex !== -1) {
+    const before = body.substring(0, splitIndex);
+    const after = body.substring(splitIndex);
+    return { before, after, hasSplit: true };
+  }
+  
+  return { before: body, after: '', hasSplit: false };
+};
 
 interface NOCGeneratorProps {
   companyData: CompanyData;
@@ -65,7 +98,7 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
   // Seal / Stamp states & refs
   const [sealImage, setSealImage] = useState<string | null>(null);
   const [sealPos, setSealPos] = useState<{ x: number; y: number }>({ x: 340, y: 520 });
-  const [sealSize, setSealSize] = useState<number>(120);
+  const [sealSize, setSealSize] = useState<number>(190);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const sealInputRef = useRef<HTMLInputElement | null>(null);
   const documentRef = useRef<HTMLDivElement | null>(null);
@@ -588,17 +621,17 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
           <div className="bg-white p-2.5 sm:p-3 rounded-xl border border-neutral-200 shadow-xs space-y-2.5">
             <div className="flex items-center justify-between border-b pb-1">
               <h3 className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Stamp className="w-3.5 h-3.5 text-emerald-600" />
-                Company Seal / Stamp (সিল ও স্ট্যাম্প):
+                <Stamp className="w-3.5 h-3.5 text-violet-600" />
+                Company Seal (সিল):
               </h3>
               {sealImage && (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-600" /> Attached
+                <span className="text-[10px] bg-violet-100 text-violet-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-violet-600" /> Attached
                 </span>
               )}
             </div>
 
-            <input
+             <input
               ref={sealInputRef}
               type="file"
               accept="image/*"
@@ -610,10 +643,10 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
               <button
                 type="button"
                 onClick={() => sealInputRef.current?.click()}
-                className="w-full py-3 px-4 border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
+                className="w-full py-3 px-4 border-2 border-dashed border-violet-400 hover:border-violet-600 bg-violet-50/80 hover:bg-violet-100/70 text-violet-700 hover:text-violet-800 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 group shadow-xs"
               >
-                <Upload className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
-                <span>Attach Official Seal Image (সিল আপলোড করুন)</span>
+                <Upload className="w-4 h-4 text-violet-600 group-hover:scale-110 transition-transform" />
+                <span>Attach Seal Image (সিল আপলোড করুন)</span>
               </button>
             ) : (
               <div className="space-y-2">
@@ -623,8 +656,8 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-neutral-800 truncate">Official Stamp Attached</p>
-                    <p className="text-[10px] text-emerald-600 font-medium">
-                      ডকুমেন্টের উপর মাউস দিয়ে ড্র্যাগ করে ইচ্ছামত স্থানে বসান
+                    <p className="text-[10px] text-violet-600 font-medium">
+                      ডকুমেন্টের নির্ধারিত স্থানে (Sincerely-এর পাশে) সিলটি স্বয়ংক্রিয়ভাবে বসে যাবে
                     </p>
                   </div>
                   <button
@@ -661,13 +694,6 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                       <ZoomIn className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setSealPos({ x: 340, y: 520 })}
-                    className="text-[10px] font-bold text-indigo-600 hover:underline cursor-pointer"
-                  >
-                    Reset Position
-                  </button>
                 </div>
               </div>
             )}
@@ -680,100 +706,6 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
             ref={documentRef}
             className="bg-white rounded-xl border border-neutral-300 shadow-xl p-8 sm:p-12 min-h-[700px] flex flex-col justify-between relative overflow-hidden font-serif"
           >
-            {/* Draggable & Resizable Seal / Stamp Element */}
-            {sealImage && (
-              <motion.div
-                drag={!isResizing}
-                dragConstraints={documentRef}
-                dragElastic={0}
-                dragMomentum={false}
-                key={`seal-${sealPos.x}-${sealPos.y}`}
-                initial={{ x: 0, y: 0 }}
-                onDragEnd={(_, info) => {
-                  setSealPos((prev) => ({
-                    x: prev.x + info.offset.x,
-                    y: prev.y + info.offset.y,
-                  }));
-                }}
-                style={{
-                  position: 'absolute',
-                  left: `${sealPos.x}px`,
-                  top: `${sealPos.y}px`,
-                  width: `${sealSize}px`,
-                }}
-                className="z-30 cursor-grab active:cursor-grabbing group select-none touch-none"
-              >
-                <div className="relative border-2 border-dashed border-emerald-500/30 group-hover:border-emerald-500 rounded-xl p-1 transition-all bg-emerald-50/10">
-                  <img
-                    src={sealImage}
-                    alt="Company Seal / Stamp"
-                    className="w-full h-auto object-contain pointer-events-none drop-shadow-md select-none opacity-95 hover:opacity-100"
-                    draggable={false}
-                  />
-
-                  {/* Corner Resize Handle - Bottom Right */}
-                  <div
-                    onPointerDown={handleResizePointerDown}
-                    className="absolute -bottom-3 -right-3 w-7 h-7 bg-emerald-600 hover:bg-emerald-700 border-2 border-white rounded-full shadow-lg cursor-se-resize flex items-center justify-center transition-all z-50 text-white active:scale-125 hover:scale-110"
-                    title="Corner resize: Drag to resize seal (কোণায় চেপে টেনে বড়/ছোট করুন)"
-                  >
-                    <Scaling className="w-3.5 h-3.5" />
-                  </div>
-
-                  {/* Top-Right Quick Delete Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSealImage(null);
-                    }}
-                    className="absolute -top-3 -right-3 w-6 h-6 bg-rose-500 hover:bg-rose-600 border-2 border-white rounded-full shadow-md text-white flex items-center justify-center font-bold text-xs cursor-pointer z-50 transition-transform hover:scale-110"
-                    title="Remove Seal (মুছে ফেলুন)"
-                  >
-                    ✕
-                  </button>
-
-                  {/* Top-Left Move Indicator */}
-                  <div
-                    className="absolute -top-3 -left-3 w-6 h-6 bg-neutral-800 text-white rounded-full shadow-md flex items-center justify-center text-xs z-40"
-                    title="Drag seal to move (টেনে সরান)"
-                  >
-                    <Move className="w-3 h-3 text-emerald-400" />
-                  </div>
-
-                  {/* Floating Action Badge on Hover */}
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 hidden group-hover:flex items-center gap-2 bg-neutral-900/95 text-white px-3 py-1 rounded-full text-[10px] font-sans shadow-xl backdrop-blur-xs whitespace-nowrap z-50 border border-neutral-700">
-                    <span className="font-bold text-emerald-400 flex items-center gap-1">
-                      <Move className="w-3 h-3" /> Drag • Resize Corner
-                    </span>
-                    <span className="text-neutral-400">|</span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSealSize((s) => Math.max(50, s - 15));
-                      }}
-                      className="hover:text-amber-300 px-1 font-black cursor-pointer bg-neutral-800 rounded hover:bg-neutral-700"
-                      title="Decrease Size"
-                    >
-                      -
-                    </button>
-                    <span className="font-mono text-emerald-300 text-[10px]">{sealSize}px</span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSealSize((s) => Math.min(300, s + 15));
-                      }}
-                      className="hover:text-amber-300 px-1 font-black cursor-pointer bg-neutral-800 rounded hover:bg-neutral-700"
-                      title="Increase Size"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
             {/* Top Company Pad Accent Bars */}
             <div
               className="absolute top-0 left-0 right-0 h-3"
@@ -818,19 +750,83 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                     placeholder="Type or modify your NOC text here..."
                   />
                 </div>
-              ) : (
-                <div
-                  className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif p-4 bg-white/90"
-                  dangerouslySetInnerHTML={{
-                    __html: nocBody
-                      .replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;')
-                      .replace(/&lt;b&gt;/g, '<strong class="font-bold text-neutral-950">')
-                      .replace(/&lt;\/b&gt;/g, '</strong>')
-                  }}
-                />
-              )}
+              ) : (() => {
+                const { before, after, hasSplit } = splitNocBody(nocBody);
+                return hasSplit ? (
+                  <div className="space-y-6">
+                    <div
+                      className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif"
+                      dangerouslySetInnerHTML={{
+                        __html: before
+                          .replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/&lt;b&gt;/g, '<strong class="font-bold text-neutral-950">')
+                          .replace(/&lt;\/b&gt;/g, '</strong>')
+                      }}
+                    />
+                    <div className="relative pt-2">
+                      {sealImage && (
+                        <div
+                          className="absolute z-20 pointer-events-none select-none transition-all"
+                          style={{
+                            left: '26%',
+                            top: '-15px',
+                            width: `${sealSize}px`,
+                          }}
+                        >
+                          <img
+                            src={sealImage}
+                            alt="Company Seal"
+                            className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125 rotate-[-3deg]"
+                          />
+                        </div>
+                      )}
+                      <div
+                        className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif relative z-10"
+                        dangerouslySetInnerHTML={{
+                          __html: after
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/&lt;b&gt;/g, '<strong class="font-bold text-neutral-950">')
+                            .replace(/&lt;\/b&gt;/g, '</strong>')
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    {sealImage && (
+                      <div
+                        className="absolute z-20 pointer-events-none select-none transition-all"
+                        style={{
+                          left: '26%',
+                          bottom: '60px',
+                          width: `${sealSize}px`,
+                        }}
+                      >
+                        <img
+                          src={sealImage}
+                          alt="Company Seal"
+                          className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125 rotate-[-3deg]"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className="whitespace-pre-wrap text-sm sm:text-base text-neutral-900 leading-relaxed font-serif bg-white/90"
+                      dangerouslySetInnerHTML={{
+                        __html: nocBody
+                          .replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/&lt;b&gt;/g, '<strong class="font-bold text-neutral-950">')
+                          .replace(/&lt;\/b&gt;/g, '</strong>')
+                      }}
+                    />
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Bottom Company Pad Footer */}

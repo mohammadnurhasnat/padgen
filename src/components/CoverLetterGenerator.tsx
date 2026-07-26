@@ -83,6 +83,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
     if (key === 'applicantName') setCompanyData((prev) => ({ ...prev, empName: value }));
     if (key === 'designation') setCompanyData((prev) => ({ ...prev, empRole: value }));
     if (key === 'referenceAddress') setCompanyData((prev) => ({ ...prev, address: value }));
+    if (key === 'medicalHospitalAddress') setCompanyData((prev) => ({ ...prev, address: value }));
   };
 
   const handleLetterBodyChange = (value: string) => {
@@ -229,7 +230,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
 
               {/* Visa Category Template Selector */}
               <div className="mb-5">
-                <label className="block text-[10px] font-bold uppercase tracking-wider mb-2 text-neutral-500">
+                <label className="block text-[10px] font-bold titlecase tracking-wider mb-2 text-neutral-500">
                   Visa Category Template
                 </label>
                 <select
@@ -251,7 +252,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
               {/* Dynamic fields grid */}
               <div className="space-y-4">
                 <div className="border-t pt-4 border-neutral-100">
-                  <h3 className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-3">
+                  <h3 className="text-[10px] font-extrabold text-neutral-400 titlecase tracking-widest mb-3">
                     Applicant & Travel Details
                   </h3>
                 </div>
@@ -317,7 +318,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                 </div>
 
                 <div className="border-t pt-4 border-neutral-100">
-                  <h3 className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-3">
+                  <h3 className="text-[10px] font-extrabold text-neutral-400 titlecase tracking-widest mb-3">
                     Employment Information
                   </h3>
                 </div>
@@ -367,7 +368,7 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                 </div>
 
                 <div className="border-t pt-4 border-neutral-100">
-                  <h3 className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-widest mb-3">
+                  <h3 className="text-[10px] font-extrabold text-neutral-400 titlecase tracking-widest mb-3">
                     Travel & References
                   </h3>
                 </div>
@@ -418,19 +419,121 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
                   </div>
                 )}
 
-                <div>
-                  <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
-                    <MapPin className="w-3.5 h-3.5 text-neutral-400" />
-                    Indian Reference / Hotel Address
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={coverFields.referenceAddress}
-                    onChange={(e) => handleCoverFieldChange('referenceAddress', e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
-                    placeholder={DEMO_COVER_LETTER_FIELDS.referenceAddress}
-                  />
-                </div>
+                {selectedCategory === 'Business Visa' ? (
+                  <>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <Briefcase className="w-3.5 h-3.5 text-neutral-400" />
+                        Indian Business Name
+                      </label>
+                      <input
+                        type="text"
+                        value={coverFields.indianBusinessName || ''}
+                        onChange={(e) => handleCoverFieldChange('indianBusinessName', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. Reliance Industries Limited"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                        Indian Business Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={coverFields.indianBusinessAddress || ''}
+                        onChange={(e) => handleCoverFieldChange('indianBusinessAddress', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. Maker Chambers IV, 222 Nariman Point, Mumbai, Maharashtra 400021, India"
+                      />
+                    </div>
+                  </>
+                ) : (selectedCategory === 'Medical Visa (Patient)' || selectedCategory === 'Medical Attendant Visa') ? (
+                  <>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <Heart className="w-3.5 h-3.5 text-neutral-400" />
+                        Hospital Name
+                      </label>
+                      <input
+                        type="text"
+                        value={coverFields.medicalHospitalName || ''}
+                        onChange={(e) => handleCoverFieldChange('medicalHospitalName', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. Apollo Hospitals Chennai"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                        Hospital Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={coverFields.medicalHospitalAddress || ''}
+                        onChange={(e) => handleCoverFieldChange('medicalHospitalAddress', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. 21 Greams Lane, Off Greams Road, Chennai, Tamil Nadu 600006, India"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <Heart className="w-3.5 h-3.5 text-neutral-400" />
+                        Patient's Medical Department
+                      </label>
+                      <input
+                        type="text"
+                        value={coverFields.medicalDepartment || ''}
+                        onChange={(e) => handleCoverFieldChange('medicalDepartment', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. Cardiology"
+                      />
+                    </div>
+                  </>
+                ) : selectedCategory === 'Double Entry Visa' ? (
+                  <>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <Briefcase className="w-3.5 h-3.5 text-neutral-400" />
+                        Delhi Embassy Name (To face/visit)
+                      </label>
+                      <input
+                        type="text"
+                        value={coverFields.delhiEmbassyName || ''}
+                        onChange={(e) => handleCoverFieldChange('delhiEmbassyName', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder="e.g. Embassy of the United States"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                        <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                        Indian Reference / Hotel Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={coverFields.referenceAddress}
+                        onChange={(e) => handleCoverFieldChange('referenceAddress', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                        placeholder={DEMO_COVER_LETTER_FIELDS.referenceAddress}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5 text-neutral-600">
+                      <MapPin className="w-3.5 h-3.5 text-neutral-400" />
+                      Indian Reference / Hotel Address
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={coverFields.referenceAddress}
+                      onChange={(e) => handleCoverFieldChange('referenceAddress', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border text-sm transition-colors bg-white border-neutral-200 text-neutral-800 focus:ring-1 focus:ring-[var(--ui-accent)] focus:outline-none focus:border-[var(--ui-accent)]"
+                      placeholder={DEMO_COVER_LETTER_FIELDS.referenceAddress}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -453,18 +556,24 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
           </div>
 
           {/* High Fidelity Plain White A4 Paper sheet */}
-          <div className="w-full max-w-2xl bg-white shadow-xl relative rounded-sm border border-neutral-200 overflow-hidden aspect-[210/297] flex flex-col p-6 sm:p-10 print:shadow-none print:border-none print:p-0 box-border">
+          <div 
+            className="w-full max-w-2xl bg-white shadow-xl relative rounded-sm border border-neutral-200 overflow-hidden aspect-[210/297] flex flex-col pt-12 pb-8 px-6 sm:pt-20 sm:pb-12 sm:px-14 print:shadow-none print:border-none print:p-0 box-border"
+          >
             {/* Letter Body Typing Container on pure white A4 paper */}
-            <div className="flex-grow w-full h-full bg-white select-text overflow-hidden">
+            <div className="flex-grow w-full h-full bg-white select-text overflow-hidden" style={{ paddingTop: '0.75in' }}>
               {coverMode === 'edit' ? (
                 <textarea
                   value={letterBody}
                   onChange={(e) => handleLetterBodyChange(e.target.value)}
-                  className="w-full h-full border-0 focus:ring-0 p-0 m-0 resize-none font-serif text-slate-900 text-sm sm:text-base leading-relaxed bg-transparent focus:outline-none placeholder-slate-400"
+                  className="w-full h-full border-0 focus:ring-0 m-0 resize-none font-serif text-slate-900 text-sm sm:text-base leading-relaxed bg-transparent focus:outline-none placeholder-slate-400"
+                  style={{ paddingBottom: '0.75in' }}
                   placeholder="Type or modify your visa cover letter content here..."
                 />
               ) : (
-                <div className="w-full h-full font-serif text-slate-900 text-sm sm:text-base leading-relaxed whitespace-pre-wrap overflow-y-auto pr-2 break-words">
+                <div 
+                  className="w-full h-full font-serif text-slate-900 text-sm sm:text-base leading-relaxed whitespace-pre-wrap overflow-y-auto pr-2 break-words"
+                  style={{ paddingBottom: '0.75in' }}
+                >
                   {letterBody.split('\n').map((para, idx) => {
                     const trimmed = para.trim();
                     const isBold =
@@ -492,25 +601,29 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
 
       {/* HIDDEN PRINT TEMPLATE FOR CLEAN WHITE A4 PAPER */}
       <div className="hidden print:block w-full h-full bg-white font-serif p-0 m-0">
-        <div className="relative w-full aspect-[210/297] flex flex-col p-12 box-border bg-white text-slate-900 text-base leading-relaxed whitespace-pre-wrap">
-          {letterBody.split('\n').map((para, idx) => {
-            const trimmed = para.trim();
-            const isBold =
-              trimmed.startsWith('Subject:') ||
-              trimmed.startsWith('To,') ||
-              trimmed.startsWith('Dear') ||
-              trimmed.startsWith('Sincerely,') ||
-              trimmed.toLowerCase() === 'sincerely';
+        <div 
+          className="relative w-full aspect-[210/297] flex flex-col pt-24 pb-12 px-14 box-border bg-white text-slate-900 text-base leading-relaxed whitespace-pre-wrap"
+        >
+          <div style={{ marginTop: '0.75in' }}>
+            {letterBody.split('\n').map((para, idx) => {
+              const trimmed = para.trim();
+              const isBold =
+                trimmed.startsWith('Subject:') ||
+                trimmed.startsWith('To,') ||
+                trimmed.startsWith('Dear') ||
+                trimmed.startsWith('Sincerely,') ||
+                trimmed.toLowerCase() === 'sincerely';
 
-            return (
-              <p
-                key={idx}
-                className={`mb-1 min-h-[1.5rem] ${isBold ? 'font-bold' : 'font-normal'}`}
-              >
-                {para}
-              </p>
-            );
-          })}
+              return (
+                <p
+                  key={idx}
+                  className={`mb-1 min-h-[1.5rem] ${isBold ? 'font-bold' : 'font-normal'}`}
+                >
+                  {para}
+                </p>
+              );
+            })}
+          </div>
         </div>
       </div>
     </motion.div>

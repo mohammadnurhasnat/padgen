@@ -30,6 +30,12 @@ export function generateTemplateText(category: VisaCategory, fields: CoverLetter
   const travelToDate = fields.travelToDate || DEMO_COVER_LETTER_FIELDS.travelToDate;
   const referenceAddress = fields.referenceAddress || DEMO_COVER_LETTER_FIELDS.referenceAddress;
   const letterDate = fields.letterDate || DEMO_COVER_LETTER_FIELDS.letterDate;
+  const indianBusinessName = fields.indianBusinessName || '';
+  const indianBusinessAddress = fields.indianBusinessAddress || '';
+  const medicalHospitalName = fields.medicalHospitalName || '';
+  const medicalHospitalAddress = fields.medicalHospitalAddress || '';
+  const medicalDepartment = fields.medicalDepartment || '';
+  const delhiEmbassyName = fields.delhiEmbassyName || '';
 
   const fDob = formatDateString(dob) || '[Date of Birth]';
   const fJoiningDate = formatDateString(joiningDate) || '[Joining Date]';
@@ -69,6 +75,10 @@ ${applicantName || '[Applicant Name]'}
 Passport No: ${passportNumber || '[Passport Number]'}`;
 
     case 'Business Visa':
+      const hostNameText = indianBusinessName ? `${indianBusinessName}` : '';
+      const hostAddressText = indianBusinessAddress ? `${indianBusinessAddress}` : (referenceAddress || '[Indian Reference / Hotel Address]');
+      const hostSectionText = hostNameText ? `${hostNameText}\n${hostAddressText}` : hostAddressText;
+
       return `${dateSection}
 
 ${addressSection}
@@ -82,7 +92,7 @@ I, ${applicantName || '[Applicant Name]'} (Passport No: ${passportNumber || '[Pa
 The purpose of my visit is to attend key business discussions, explore corporate opportunities, and meet with our local business partners in India from ${fTravelFrom} to ${fTravelTo}.
 
 My primary business host and reference address in India will be:
-${referenceAddress || '[Indian Reference / Hotel Address]'}
+${hostSectionText}
 
 All expenses pertaining to my business trip, including travel, boarding, lodging, and medical insurance, will be fully borne by ${companyName || '[Company Name]'}. I have enclosed my invitation letter, trade certificate, tax documents, and financial statements for your review.
 
@@ -99,6 +109,13 @@ ${companyName || '[Company Name]'}
 Passport No: ${passportNumber || '[Passport Number]'}`;
 
     case 'Medical Visa (Patient)':
+      const hospName = medicalHospitalName || '';
+      const hospAddr = medicalHospitalAddress || referenceAddress || '[Hospital Address]';
+      const hospitalSection = hospName ? `${hospName}\n${hospAddr}` : hospAddr;
+      const deptParagraph = medicalDepartment 
+        ? `I have been suffering from health complications that require immediate advanced diagnosis and specialized medical procedures in the ${medicalDepartment} department.`
+        : `I have been suffering from health complications that require immediate advanced diagnosis and medical procedures.`;
+
       return `${dateSection}
 
 ${addressSection}
@@ -109,10 +126,10 @@ Dear Sir/Madam,
 
 I, ${applicantName || '[Applicant Name]'} (Passport No: ${passportNumber || '[Passport Number]'}, Date of Birth: ${fDob}), am writing this letter to request a Medical Visa to travel to India for critical specialized medical treatment.
 
-I am currently employed at ${companyName || '[Company Name]'} as ${designation || '[Designation]'} (Joining Date: ${fJoiningDate}). I have been suffering from health complications that require immediate advanced diagnosis and medical procedures.
+I am currently employed at ${companyName || '[Company Name]'} as ${designation || '[Designation]'} (Joining Date: ${fJoiningDate}). ${deptParagraph}
 
 Upon consultation, I have been referred to seek advanced treatment in India. I have scheduled appointments and plan to undergo treatment from ${fTravelFrom} to ${fTravelTo} at the following medical facility:
-${referenceAddress || '[Indian Reference / Hotel Address]'}
+${hospitalSection}
 
 I will be funding all medical expenses, travel, and accommodation myself. All supporting documents, including the doctor's referral letter, hospital appointment confirmation, and my financial statement, are enclosed herewith.
 
@@ -127,6 +144,13 @@ ${applicantName || '[Applicant Name]'}
 Passport No: ${passportNumber || '[Passport Number]'}`;
 
     case 'Medical Attendant Visa':
+      const attHospName = medicalHospitalName || '';
+      const attHospAddr = medicalHospitalAddress || referenceAddress || '[Hospital Address]';
+      const attHospitalSection = attHospName ? `${attHospName}\n${attHospAddr}` : attHospAddr;
+      const attDeptParagraph = medicalDepartment 
+        ? `I will be traveling to assist the patient, ${patientInfo || '[Patient Info]'}, who is undergoing critical medical treatment in the ${medicalDepartment} department in India.`
+        : `I will be traveling to assist the patient, ${patientInfo || '[Patient Info]'}, who is undergoing critical medical treatment in India.`;
+
       return `${dateSection}
 
 ${addressSection}
@@ -137,10 +161,10 @@ Dear Sir/Madam,
 
 I, ${applicantName || '[Applicant Name]'} (Passport No: ${passportNumber || '[Passport Number]'}, Date of Birth: ${fDob}), am writing this letter to request a Medical Attendant Visa to travel to India to accompany and assist a medical patient.
 
-I am currently employed at ${companyName || '[Company Name]'} as ${designation || '[Designation]'} (Joining Date: ${fJoiningDate}). I will be traveling to assist the patient, ${patientInfo || '[Patient Info]'}, who is undergoing critical medical treatment in India.
+I am currently employed at ${companyName || '[Company Name]'} as ${designation || '[Designation]'} (Joining Date: ${fJoiningDate}). ${attDeptParagraph}
 
 The treatment is scheduled from ${fTravelFrom} to ${fTravelTo} at the following medical institution:
-${referenceAddress || '[Indian Reference / Hotel Address]'}
+${attHospitalSection}
 
 As an attendant, I will be responsible for providing physical support, coordinating with the hospital staff, and managing accommodation during our stay. My presence is vital to facilitate the patient's recovery and care.
 
@@ -155,6 +179,11 @@ ${applicantName || '[Applicant Name]'}
 Passport No: ${passportNumber || '[Passport Number]'}`;
 
     case 'Double Entry Visa':
+      const embName = delhiEmbassyName || '';
+      const doubleEntryParagraph = embName
+        ? `The primary purpose of my travel to New Delhi, India is to attend a visa interview and submit my application at the ${embName}. Since the country I wish to travel to does not have consular representation in Bangladesh, I must travel to their Embassy in New Delhi for this official procedure, necessitating a double-entry visa to facilitate my travel, transit, and subsequent return.`
+        : `My travel plan consists of two distinct entries. The first entry is from ${fTravelFrom} to ${fTravelTo}, during which I will visit India for sightseeing and personal reasons. Following this, I have an essential requirement to re-enter India shortly after a brief side excursion to a neighboring country.`;
+
       return `${dateSection}
 
 ${addressSection}
@@ -165,12 +194,12 @@ Dear Sir/Madam,
 
 I, ${applicantName || '[Applicant Name]'} (Passport No: ${passportNumber || '[Passport Number]'}, Date of Birth: ${fDob}), currently employed at ${companyName || '[Company Name]'} as ${designation || '[Designation]'} (Joining Date: ${fJoiningDate}), am writing this letter to request a Double Entry Visa to India.
 
-My travel plan consists of two distinct entries. The first entry is from ${fTravelFrom} to ${fTravelTo}, during which I will visit India for sightseeing and personal reasons. Following this, I have an essential requirement to re-enter India shortly after a brief side excursion to a neighboring country.
+${doubleEntryParagraph}
 
 My reference contact and address in India is:
 ${referenceAddress || '[Indian Reference / Hotel Address]'}
 
-I am fully capable of financing my entire travel and stay in India. All necessary papers, including my round-trip flight bookings, hotel reservations, and bank statements, are enclosed for your review.
+I am fully capable of financing my entire travel and stay in India. All necessary papers, including my round-trip flight bookings, hotel reservations, embassy appointment/interview letter, and bank statements, are enclosed for your review.
 
 Therefore, I kindly request you to grant me a Double Entry Visa. I assure you that I will respect all the laws and regulations of India.
 

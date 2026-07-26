@@ -135,7 +135,8 @@ function renderFormattedText(
   startY: number,
   maxWidth: number,
   fontSize: number,
-  lineHeight: number
+  lineHeight: number,
+  onSincerelyY?: (y: number) => void
 ): number {
   let y = startY;
   const paragraphs = text.split('\n');
@@ -144,6 +145,15 @@ function renderFormattedText(
     if (!paragraph.trim()) {
       y += lineHeight * 0.5;
       continue;
+    }
+
+    if (onSincerelyY && (
+      paragraph.toLowerCase().includes('sincerely') || 
+      paragraph.toLowerCase().includes('regards') || 
+      paragraph.toLowerCase().includes('yours') ||
+      paragraph.toLowerCase().includes('faithfully')
+    )) {
+      onSincerelyY(y);
     }
 
     // Parse bold tags in paragraph
@@ -230,6 +240,8 @@ export function generateNOCPDF(
     sealSize: number;
     containerWidth: number;
     containerHeight: number;
+    signatureImage?: string | null;
+    signatureText?: string | null;
   }
 ) {
   const doc = new jsPDF({
@@ -313,28 +325,57 @@ export function generateNOCPDF(
   doc.setFontSize(12);
   doc.setTextColor(30, 41, 59);
 
-  renderFormattedText(doc, cleanBody, 20, 85, 170, 12, 8);
+  let sincerelyY: number | null = null;
+  const finalY = renderFormattedText(doc, cleanBody, 20, 85, 170, 12, 8, (y) => {
+    sincerelyY = y;
+  });
 
   // 6. Draw Seal / Stamp Image onto PDF if provided
   if (sealData && sealData.sealImage) {
     try {
-      const { sealImage, sealPos, sealSize, containerWidth, containerHeight } = sealData;
-      const cWidth = containerWidth || 600;
-      const cHeight = containerHeight || 800;
+      const { sealImage, sealSize, signatureImage } = sealData;
 
       const imgProps = doc.getImageProperties(sealImage);
       const aspect = (imgProps && imgProps.height && imgProps.width) 
         ? imgProps.height / imgProps.width 
         : 1;
 
-      const widthMm = (sealSize / cWidth) * 210;
+      // Normalize width using a reference 600px preview container width
+      const widthMm = (sealSize / 600) * 210;
       const heightMm = widthMm * aspect;
 
-      const xMm = Math.max(0, Math.min(210 - widthMm, (sealPos.x / cWidth) * 210));
-      const yMm = Math.max(0, Math.min(297 - heightMm, (sealPos.y / cHeight) * 297));
+      // Fixed position: below closing paragraph, right of Sincerely, and above signatory name
+      const xMm = 61;
+      let yMm = 200; // default fallback
+
+      if (sincerelyY !== null) {
+        yMm = sincerelyY - 4;
+      } else {
+        yMm = Math.max(85, finalY - 42);
+      }
 
       const format = sealImage.includes('data:image/png') ? 'PNG' : 'JPEG';
       doc.addImage(sealImage, format, xMm, yMm, widthMm, heightMm, undefined, 'FAST');
+
+      // Now draw signature if present!
+      if (signatureImage) {
+        try {
+          const sigProps = doc.getImageProperties(signatureImage);
+          const sigAspect = (sigProps && sigProps.height && sigProps.width) 
+            ? sigProps.height / sigProps.width 
+            : 0.5;
+          
+          const sigWidthMm = widthMm * 0.7; // 70% of seal width
+          const sigHeightMm = sigWidthMm * sigAspect;
+          const sigXMm = xMm + (widthMm - sigWidthMm) / 2;
+          const sigYMm = yMm + (heightMm - sigHeightMm) / 2;
+          
+          const sigFormat = signatureImage.includes('data:image/png') ? 'PNG' : 'JPEG';
+          doc.addImage(signatureImage, sigFormat, sigXMm, sigYMm, sigWidthMm, sigHeightMm, undefined, 'FAST');
+        } catch (sigErr) {
+          console.error('Failed to draw signature image on PDF seal:', sigErr);
+        }
+      }
     } catch (err) {
       console.error('Failed to draw seal on PDF:', err);
     }
@@ -347,32 +388,51 @@ export function generateNOCPDF(
   // Save PDF with HD Vector Buffer to guarantee >= 200KB ultra-high resolution file size
   const filename = `${fields.applicantName.toLowerCase().replace(/\s+/g, '_')}_noc_certificate.pdf`;
 
-  const pdfOutput = doc.output('blob');
+  const pdfBuffer = doc.output('arraybuffer');
+  const pdfBytes = new Uint8Array(pdfBuffer);
   const targetSize = 210 * 1024; // 210 KB minimum size
 
-  if (pdfOutput.size < targetSize) {
-    const paddingSize = targetSize - pdfOutput.size;
+  if (pdfBytes.length < targetSize) {
+    const paddingSize = targetSize - pdfBytes.length;
     const paddingComment = '\n% HD Vector Quality Stream Buffer: ' + 'X'.repeat(paddingSize);
     
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const baseContent = reader.result as string;
-      const eofIndex = baseContent.lastIndexOf('%%EOF');
-      let finalContent: string;
-      if (eofIndex !== -1) {
-        finalContent = baseContent.slice(0, eofIndex) + paddingComment + '\n%%EOF';
-      } else {
-        finalContent = baseContent + paddingComment;
+    // Convert paddingComment to Uint8Array safely using TextEncoder
+    const encoder = new TextEncoder();
+    const paddingBytes = encoder.encode(paddingComment);
+
+    // Locate %%EOF (byte sequence 37, 37, 69, 79, 70 in ASCII)
+    let eofIndex = -1;
+    for (let i = pdfBytes.length - 5; i >= 0; i--) {
+      if (pdfBytes[i] === 37 && pdfBytes[i+1] === 37 && pdfBytes[i+2] === 69 && pdfBytes[i+3] === 79 && pdfBytes[i+4] === 70) {
+        eofIndex = i;
+        break;
       }
-      const finalBlob = new Blob([finalContent], { type: 'application/pdf' });
-      const url = URL.createObjectURL(finalBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.click();
-      URL.revokeObjectURL(url);
-    };
-    reader.readAsText(pdfOutput);
+    }
+
+    let finalBytes: Uint8Array;
+    if (eofIndex !== -1) {
+      const part1 = pdfBytes.subarray(0, eofIndex);
+      const part2 = pdfBytes.subarray(eofIndex);
+      
+      finalBytes = new Uint8Array(part1.length + paddingBytes.length + part2.length);
+      finalBytes.set(part1, 0);
+      finalBytes.set(paddingBytes, part1.length);
+      finalBytes.set(part2, part1.length + paddingBytes.length);
+    } else {
+      finalBytes = new Uint8Array(pdfBytes.length + paddingBytes.length);
+      finalBytes.set(pdfBytes, 0);
+      finalBytes.set(paddingBytes, pdfBytes.length);
+    }
+
+    const finalBlob = new Blob([finalBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(finalBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } else {
     doc.save(filename);
   }
