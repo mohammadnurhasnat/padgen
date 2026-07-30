@@ -11,9 +11,11 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// API route for 14-minute keep-alive heartbeat ping (Render service active)
+// API route for keep-alive heartbeat ping (Render service active)
 app.get("/api/ping", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.json({ status: "ok", active: true, timestamp: new Date().toISOString() });
 });
 
 // API route to generate professional design and copy using Gemini AI

@@ -113,18 +113,38 @@ export default function App() {
     }
   }, []);
 
-  // 14-minute auto-ping keep-alive interval (14 * 60 * 1000 ms) to keep Render instance active
+  // Auto-ping keep-alive interval (every 12 minutes) and on tab visibility to keep Render instance active
   useEffect(() => {
-    const PING_INTERVAL_MS = 14 * 60 * 1000;
-    const interval = setInterval(() => {
-      fetch('/api/ping')
+    const doPing = () => {
+      fetch('/api/ping', { cache: 'no-store' })
         .then((res) => res.json())
         .catch(() => {
-          fetch('/').catch(() => {});
+          fetch('/', { cache: 'no-store' }).catch(() => {});
         });
-    }, PING_INTERVAL_MS);
+    };
 
-    return () => clearInterval(interval);
+    // Ping immediately on load
+    doPing();
+
+    // Ping every 12 minutes (720,000 ms) before Render's 15-minute sleep threshold
+    const PING_INTERVAL_MS = 12 * 60 * 1000;
+    const interval = setInterval(doPing, PING_INTERVAL_MS);
+
+    // Ping when user returns to tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        doPing();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', doPing);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', doPing);
+    };
   }, []);
 
   // Handle randomizer triggers
