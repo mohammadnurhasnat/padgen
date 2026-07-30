@@ -11,6 +11,11 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// API route for 14-minute keep-alive heartbeat ping (Render service active)
+app.get("/api/ping", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // API route to generate professional design and copy using Gemini AI
 app.post("/api/generate-premium-design", async (req, res) => {
   try {

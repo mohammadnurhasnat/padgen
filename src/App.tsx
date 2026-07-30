@@ -113,6 +113,20 @@ export default function App() {
     }
   }, []);
 
+  // 14-minute auto-ping keep-alive interval (14 * 60 * 1000 ms) to keep Render instance active
+  useEffect(() => {
+    const PING_INTERVAL_MS = 14 * 60 * 1000;
+    const interval = setInterval(() => {
+      fetch('/api/ping')
+        .then((res) => res.json())
+        .catch(() => {
+          fetch('/').catch(() => {});
+        });
+    }, PING_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Handle randomizer triggers
   const handleGenerateDesigner = () => {
     const randomTheme = Math.floor(Math.random() * THEMES.length);
