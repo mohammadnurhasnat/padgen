@@ -48,10 +48,13 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
   onOpenHistory,
   historyCount = 0,
 }) => {
-  const [companyName, setCompanyName] = useState<string>(companyData.name || 'Ratul Tours');
+  const [companyName, setCompanyName] = useState<string>(companyData.companyName || companyData.name || 'Ratul Tours');
   const [roleTitle, setRoleTitle] = useState<string>('Proprietor');
   const [customRole, setCustomRole] = useState<string>('');
   const [isCustomRole, setIsCustomRole] = useState<boolean>(false);
+  const [sealShape, setSealShape] = useState<'rectangular' | 'circular' | 'rectangular_combo' | 'circular_combo'>('rectangular');
+  const [establishedYear, setEstablishedYear] = useState<string>('2020');
+  const [sloganText, setSloganText] = useState<string>(companyData.tagline || 'Excellence & Trust');
   const [selectedColor, setSelectedColor] = useState<typeof COLOR_OPTIONS[0]>(COLOR_OPTIONS[0]);
   const [tiltAngle, setTiltAngle] = useState<number>(8); // Default +8 degrees
   const [textureIntensity, setTextureIntensity] = useState<'low' | 'medium' | 'high'>('medium');
@@ -64,13 +67,54 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
 
   // Sync with companyData when changed
   useEffect(() => {
-    if (companyData.name && companyName === 'Ratul Tours') {
-      setCompanyName(companyData.name);
+    if (companyData.companyName || companyData.name) {
+      setCompanyName(companyData.companyName || companyData.name || '');
+    }
+    if (companyData.tagline) {
+      setSloganText(companyData.tagline);
     }
   }, [companyData]);
 
   // Actual Role Title string to render
   const activeRole = isCustomRole ? customRole : roleTitle;
+
+  // Helper for drawing curved text along circular arc
+  const drawCurvedText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    centerX: number,
+    centerY: number,
+    radius: number,
+    startAngleRad: number,
+    endAngleRad: number
+  ) => {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const numChars = text.length;
+    if (numChars === 0) {
+      ctx.restore();
+      return;
+    }
+
+    const angleStep = (endAngleRad - startAngleRad) / Math.max(1, numChars - 1);
+
+    for (let i = 0; i < numChars; i++) {
+      const char = text[i];
+      const angle = startAngleRad + i * angleStep;
+
+      ctx.save();
+      ctx.translate(
+        centerX + radius * Math.cos(angle),
+        centerY + radius * Math.sin(angle)
+      );
+      ctx.rotate(angle + Math.PI / 2);
+      ctx.fillText(char, 0, 0);
+      ctx.restore();
+    }
+    ctx.restore();
+  };
 
   // Generate Seal Canvas
   const generateSealCanvas = () => {
@@ -80,12 +124,21 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Dimensions for target output
-    const baseW = 500;
-    const baseH = 220;
-    const scale = 2; // HD 2x scale for ultra-sharp rendering
+    // Canvas size depending on shape
+    let baseW = 480;
+    let baseH = 220;
 
-    // Bounding Box calculation for rotated canvas so no corners clip
+    if (sealShape === 'circular') {
+      baseW = 260;
+      baseH = 260;
+    } else if (sealShape === 'rectangular_combo' || sealShape === 'circular_combo') {
+      baseW = 620;
+      baseH = 240;
+    }
+
+    const scale = 2; // HD scale
+
+    // Bounding Box calculation for rotated canvas
     const rad = (Math.abs(tiltAngle) * Math.PI) / 180;
     const boundingW = Math.ceil(baseW * Math.cos(rad) + baseH * Math.sin(rad)) + 20;
     const boundingH = Math.ceil(baseW * Math.sin(rad) + baseH * Math.cos(rad)) + 20;
@@ -115,66 +168,147 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
     // Enable slight blur filter for realistic pressed ink bleeding
     ctx.filter = 'blur(0.4px)';
 
-    // 1. Outer Rectangle Border (4px stroke, 8px inset)
-    ctx.lineWidth = 4;
-    ctx.strokeRect(8, 8, baseW - 16, baseH - 16);
-
-    // 2. Inner Rectangle Border (2px stroke, 16px inset)
-    ctx.lineWidth = 2;
-    ctx.strokeRect(16, 16, baseW - 32, baseH - 32);
-
-    // 3. Top Line: Company Name (Uppercase, bold, centered)
     const upperCompany = (companyName || 'COMPANY NAME').trim().toUpperCase();
-    let compFontSize = 28;
-    ctx.font = `bold ${compFontSize}px "Playfair Display", "Times New Roman", "Georgia", sans-serif`;
-
-    const maxTextWidth = (baseW - 60) * 0.85;
-    let compWidth = ctx.measureText(upperCompany).width;
-
-    if (compWidth > maxTextWidth && compWidth > 0) {
-      compFontSize = Math.max(14, Math.floor(28 * (maxTextWidth / compWidth)));
-      ctx.font = `bold ${compFontSize}px "Playfair Display", "Times New Roman", "Georgia", sans-serif`;
-    }
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(upperCompany, baseW / 2, 58);
-
-    // 4. Horizontal Divider Line below Company Name
-    ctx.beginPath();
-    ctx.lineWidth = 2;
-    ctx.moveTo(30, 84);
-    ctx.lineTo(baseW - 30, 84);
-    ctx.stroke();
-
-    // 5. Middle Blank Signature Line (Reserved empty)
-    ctx.beginPath();
-    ctx.lineWidth = 2;
-    ctx.moveTo(45, 130);
-    ctx.lineTo(baseW - 45, 130);
-    ctx.stroke();
-
-    // 6. Bottom Line: Role Title (Uppercase, bold, centered, visually matched font size)
     const upperRole = (activeRole || 'PROPRIETOR').trim().toUpperCase();
-    let roleFontSize = Math.min(26, compFontSize);
-    ctx.font = `bold ${roleFontSize}px "Playfair Display", "Times New Roman", "Georgia", sans-serif`;
 
-    let roleWidth = ctx.measureText(upperRole).width;
+    // DRAW RECTANGULAR SEAL
+    const drawRectangularSection = (startX: number, startY: number, width: number, height: number) => {
+      // Clean Outer & Inner borders without corner tick artifacts
+      ctx.lineWidth = 4;
+      ctx.strokeRect(startX + 8, startY + 8, width - 16, height - 16);
 
-    if (roleWidth > maxTextWidth && roleWidth > 0) {
-      roleFontSize = Math.max(13, Math.floor(roleFontSize * (maxTextWidth / roleWidth)));
-      ctx.font = `bold ${roleFontSize}px "Playfair Display", "Times New Roman", "Georgia", sans-serif`;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(startX + 16, startY + 16, width - 32, height - 32);
+
+      // Top Institution / Company Name
+      let fontSize = 24;
+      ctx.font = `bold ${fontSize}px "Playfair Display", "Times New Roman", "Georgia", serif`;
+      const maxTextWidth = width - 60;
+      let textWidth = ctx.measureText(upperCompany).width;
+      if (textWidth > maxTextWidth && textWidth > 0) {
+        fontSize = Math.max(13, Math.floor(24 * (maxTextWidth / textWidth)));
+        ctx.font = `bold ${fontSize}px "Playfair Display", "Times New Roman", "Georgia", serif`;
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(upperCompany, startX + width / 2, startY + 52);
+
+      // Top Divider Line
+      ctx.beginPath();
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(startX + 28, startY + 76);
+      ctx.lineTo(startX + width - 28, startY + 76);
+      ctx.stroke();
+
+      // Middle Blank Space for Signature
+      ctx.beginPath();
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(startX + 40, startY + 125);
+      ctx.lineTo(startX + width - 40, startY + 125);
+      ctx.stroke();
+
+      // Bottom Role: PROPRIETOR
+      let roleFontSize = Math.min(22, fontSize);
+      ctx.font = `bold ${roleFontSize}px "Playfair Display", "Times New Roman", "Georgia", serif`;
+      ctx.fillText(upperRole, startX + width / 2, startY + height - 42);
+    };
+
+    // DRAW CIRCULAR SEAL
+    const drawCircularSection = (cx: number, cy: number, radius: number) => {
+      // Outer Circle
+      ctx.beginPath();
+      ctx.lineWidth = 4;
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Inner Circle
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.arc(cx, cy, radius - 10, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Curved Top Company Name
+      let arcFont = 15;
+      ctx.font = `bold ${arcFont}px "Playfair Display", "Times New Roman", sans-serif`;
+      const topArcRadius = radius - 26;
+      drawCurvedText(ctx, upperCompany, cx, cy, topArcRadius, -Math.PI * 0.75, -Math.PI * 0.25);
+
+      // Decorative stars on sides
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('★', cx - radius + 22, cy);
+      ctx.fillText('★', cx + radius - 22, cy);
+
+      // Middle Signature Line
+      ctx.beginPath();
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(cx - 50, cy);
+      ctx.lineTo(cx + 50, cy);
+      ctx.stroke();
+
+      // Bottom PROPRIETOR
+      ctx.font = `bold 14px "Playfair Display", "Times New Roman", serif`;
+      ctx.fillText(upperRole, cx, cy + 32);
+
+      // Established Year at bottom arc
+      if (establishedYear) {
+        ctx.font = `bold 10px sans-serif`;
+        ctx.fillText(`ESTD. ${establishedYear}`, cx, cy + 54);
+      }
+    };
+
+    // DRAW RIGHT SIDE INFO (Company Name + Slogan + Est. Year)
+    const drawSideInfoSection = (startX: number, startY: number, width: number, height: number) => {
+      // Vertical Divider Line
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.moveTo(startX, startY + 20);
+      ctx.lineTo(startX, startY + height - 20);
+      ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+
+      const textX = startX + 25;
+
+      // Company Name
+      ctx.font = `bold 20px "Playfair Display", "Georgia", serif`;
+      ctx.fillText(upperCompany, textX, startY + height / 2 - 30);
+
+      // Slogan / Tagline
+      if (sloganText) {
+        ctx.font = `italic 14px "Playfair Display", "Georgia", serif`;
+        ctx.fillText(`"${sloganText}"`, textX, startY + height / 2 + 5);
+      }
+
+      // Est Year
+      if (establishedYear) {
+        ctx.font = `bold 12px sans-serif`;
+        ctx.fillText(`ESTABLISHED: ${establishedYear}`, textX, startY + height / 2 + 35);
+      }
+    };
+
+    // EXECUTE LAYOUT RENDER
+    if (sealShape === 'rectangular') {
+      drawRectangularSection(0, 0, baseW, baseH);
+    } else if (sealShape === 'circular') {
+      drawCircularSection(baseW / 2, baseH / 2, 110);
+    } else if (sealShape === 'rectangular_combo') {
+      drawRectangularSection(0, 10, 380, 220);
+      drawSideInfoSection(400, 10, 210, 220);
+    } else if (sealShape === 'circular_combo') {
+      drawCircularSection(130, 120, 105);
+      drawSideInfoSection(270, 10, 340, 220);
     }
-
-    ctx.fillText(upperRole, baseW / 2, 176);
 
     // Disable blur for composite eraser texture phase
     ctx.filter = 'none';
 
-    // 7. Realistic Ink Stamp Texture (Destination-out eraser blobs)
+    // Ink Stamp Texture
     ctx.globalCompositeOperation = 'destination-out';
 
-    // Deterministic random generator based on seed
     let pseudoRandom = seed;
     const random = () => {
       pseudoRandom = (pseudoRandom * 9301 + 49297) % 233280;
@@ -200,7 +334,6 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
       ctx.fill();
     }
 
-    // Reset composite operation
     ctx.globalCompositeOperation = 'source-over';
     ctx.restore();
 
@@ -212,7 +345,7 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
   // Trigger canvas generation whenever inputs change
   useEffect(() => {
     generateSealCanvas();
-  }, [companyName, activeRole, selectedColor, tiltAngle, textureIntensity, seed]);
+  }, [companyName, activeRole, sealShape, establishedYear, sloganText, selectedColor, tiltAngle, textureIntensity, seed]);
 
   const handleDownload = () => {
     if (!previewDataUrl) return;
@@ -267,13 +400,65 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Form Controls (5 cols) */}
         <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-5">
-          
+          {/* Seal Pattern / Shape Selector */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-neutral-700 flex items-center gap-1.5">
+              <Stamp className="w-3.5 h-3.5 text-purple-600" />
+              Seal Pattern & Layout (সিল এর ধরণ):
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSealShape('rectangular')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  sealShape === 'rectangular'
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-xs'
+                    : 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100 border-neutral-200'
+                }`}
+              >
+                Rectangular Seal
+              </button>
+              <button
+                type="button"
+                onClick={() => setSealShape('circular')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  sealShape === 'circular'
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-xs'
+                    : 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100 border-neutral-200'
+                }`}
+              >
+                Circular Seal
+              </button>
+              <button
+                type="button"
+                onClick={() => setSealShape('rectangular_combo')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  sealShape === 'rectangular_combo'
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-xs'
+                    : 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100 border-neutral-200'
+                }`}
+              >
+                Rect. + Side Info
+              </button>
+              <button
+                type="button"
+                onClick={() => setSealShape('circular_combo')}
+                className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  sealShape === 'circular_combo'
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-xs'
+                    : 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100 border-neutral-200'
+                }`}
+              >
+                Circ. + Side Info
+              </button>
+            </div>
+          </div>
 
           {/* Company Name Input */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-neutral-700 flex items-center gap-1.5">
               <Building className="w-3.5 h-3.5 text-purple-600" />
-              Company Name (কোম্পানির নাম):
+              Company / Institution Name:
             </label>
             <input
               type="text"
@@ -283,6 +468,32 @@ export const DigitalSealGenerator: React.FC<DigitalSealGeneratorProps> = ({
               className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-100 text-sm font-semibold text-neutral-800 transition-all"
             />
           </div>
+
+          {/* Side Info Details (Tagline & Established Year) */}
+          {(sealShape === 'rectangular_combo' || sealShape === 'circular_combo' || sealShape === 'circular') && (
+            <div className="grid grid-cols-2 gap-3 p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-neutral-700">Tagline / Slogan:</label>
+                <input
+                  type="text"
+                  value={sloganText}
+                  onChange={(e) => setSloganText(e.target.value)}
+                  placeholder="e.g. Excellence & Trust"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-neutral-300 bg-white"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-neutral-700">Est. Year:</label>
+                <input
+                  type="text"
+                  value={establishedYear}
+                  onChange={(e) => setEstablishedYear(e.target.value)}
+                  placeholder="e.g. 2020"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-neutral-300 bg-white"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Role Title Selection */}
           <div className="space-y-1.5">

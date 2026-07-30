@@ -168,6 +168,66 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
     if (key === 'designation') setCompanyData((prev) => ({ ...prev, empRole: value }));
   };
 
+  const [isSmartFilling, setIsSmartFilling] = useState<boolean>(false);
+
+  const handleSmartFill = async () => {
+    try {
+      setIsSmartFilling(true);
+      const compName = nocFields.companyName || companyData.companyName || companyData.name || 'Company Name';
+      const res = await fetch('/api/smart-fill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: compName,
+          industry: companyData.industry || 'Corporate',
+          applicantName: nocFields.applicantName,
+          designation: nocFields.designation,
+          nocCategory: selectedCategory,
+        }),
+      });
+      if (!res.ok) throw new Error('Smart fill failed');
+      const data = await res.json();
+      if (data.nocContent) {
+        setNocBody(data.nocContent);
+        setIsManualEdit(true);
+      }
+      if (data.empName) handleFieldChange('applicantName', data.empName);
+      if (data.empRole) handleFieldChange('designation', data.empRole);
+    } catch (err) {
+      console.error('Smart fill error in NOC:', err);
+    } finally {
+      setIsSmartFilling(false);
+    }
+  };
+
+  const [isDraggingSeal, setIsDraggingSeal] = useState<boolean>(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleSealPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingSeal(true);
+    setDragStart({ x: e.clientX - sealPos.x, y: e.clientY - sealPos.y });
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch (_) {}
+  };
+
+  const handleSealPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingSeal) return;
+    setSealPos({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    });
+  };
+
+  const handleSealPointerUp = (e: React.PointerEvent) => {
+    setIsDraggingSeal(false);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (_) {}
+  };
+
   const handleSealUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -288,6 +348,17 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
           </div>
 
           <div className="h-4 w-px bg-neutral-200 hidden sm:block mx-1" />
+
+          <button
+            type="button"
+            onClick={handleSmartFill}
+            disabled={isSmartFilling}
+            className="bg-purple-600 hover:bg-purple-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 disabled:opacity-50"
+            title="Intelligently write NOC content with Gemini AI"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{isSmartFilling ? 'Generating...' : 'Smart Fill AI'}</span>
+          </button>
 
           {onOpenHistory && (
             <button
@@ -863,18 +934,27 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                     <div className="relative pt-2">
                       {sealImage && (
                         <div
-                          className="absolute z-20 pointer-events-none select-none transition-all"
+                          onPointerDown={handleSealPointerDown}
+                          onPointerMove={handleSealPointerMove}
+                          onPointerUp={handleSealPointerUp}
+                          className="absolute z-30 cursor-grab active:cursor-grabbing select-none group/seal"
                           style={{
                             left: '26%',
                             top: '-15px',
+                            transform: `translate(${sealPos.x}px, ${sealPos.y}px)`,
                             width: `${sealSize}px`,
+                            touchAction: 'none',
                           }}
                         >
                           <img
                             src={sealImage}
                             alt="Company Seal"
-                            className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125 rotate-[-3deg]"
+                            className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125"
+                            draggable={false}
                           />
+                          <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/seal:opacity-100 bg-black/80 text-white text-[9px] px-2 py-0.5 rounded pointer-events-none whitespace-nowrap transition-opacity font-sans">
+                            Drag Seal to Position
+                          </div>
                         </div>
                       )}
                       <div
@@ -894,18 +974,27 @@ export const NOCGenerator: React.FC<NOCGeneratorProps> = ({
                   <div className="relative">
                     {sealImage && (
                       <div
-                        className="absolute z-20 pointer-events-none select-none transition-all"
+                        onPointerDown={handleSealPointerDown}
+                        onPointerMove={handleSealPointerMove}
+                        onPointerUp={handleSealPointerUp}
+                        className="absolute z-30 cursor-grab active:cursor-grabbing select-none group/seal"
                         style={{
                           left: '26%',
                           bottom: '60px',
+                          transform: `translate(${sealPos.x}px, ${sealPos.y}px)`,
                           width: `${sealSize}px`,
+                          touchAction: 'none',
                         }}
                       >
                         <img
                           src={sealImage}
                           alt="Company Seal"
-                          className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125 rotate-[-3deg]"
+                          className="w-full h-auto object-contain opacity-95 mix-blend-multiply filter contrast-125"
+                          draggable={false}
                         />
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/seal:opacity-100 bg-black/80 text-white text-[9px] px-2 py-0.5 rounded pointer-events-none whitespace-nowrap transition-opacity font-sans">
+                          Drag Seal to Position
+                        </div>
                       </div>
                     )}
                     <div

@@ -77,6 +77,38 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
     }
   }, [coverFields, selectedCategory, isManualEdit]);
 
+  const [isSmartFilling, setIsSmartFilling] = useState<boolean>(false);
+
+  const handleSmartFill = async () => {
+    try {
+      setIsSmartFilling(true);
+      const compName = coverFields.companyName || companyData.companyName || companyData.name || 'Company Name';
+      const res = await fetch('/api/smart-fill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: compName,
+          industry: companyData.industry || 'Corporate',
+          applicantName: coverFields.applicantName,
+          designation: coverFields.designation,
+          visaCategory: selectedCategory,
+        }),
+      });
+      if (!res.ok) throw new Error('Smart fill failed');
+      const data = await res.json();
+      if (data.coverLetterContent) {
+        setLetterBody(data.coverLetterContent);
+        setIsManualEdit(true);
+      }
+      if (data.empName) handleCoverFieldChange('applicantName', data.empName);
+      if (data.empRole) handleCoverFieldChange('designation', data.empRole);
+    } catch (err) {
+      console.error('Smart fill error in Cover Letter:', err);
+    } finally {
+      setIsSmartFilling(false);
+    }
+  };
+
   const handleCoverFieldChange = (key: keyof CoverLetterFields, value: string) => {
     setCoverFields((prev) => ({ ...prev, [key]: value }));
     if (key === 'companyName') setCompanyData((prev) => ({ ...prev, companyName: value }));
@@ -176,6 +208,16 @@ export const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({
           </div>
 
           <div className="h-4 w-px bg-neutral-200 hidden sm:block mx-1" />
+
+          <button
+            onClick={handleSmartFill}
+            disabled={isSmartFilling}
+            className="bg-purple-600 hover:bg-purple-500 border-b-4 border-black/20 active:border-b-0 active:translate-y-[4px] shadow-sm text-white font-bold px-3 py-1.5 rounded-lg text-xs cursor-pointer transition-all flex items-center gap-1.5 disabled:opacity-50"
+            title="Intelligently draft cover letter with Gemini AI"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{isSmartFilling ? 'Generating...' : 'Smart Fill AI'}</span>
+          </button>
 
           {onOpenHistory && (
             <button

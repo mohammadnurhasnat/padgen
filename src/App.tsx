@@ -71,6 +71,51 @@ export default function App() {
   const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [lastLoadedItem, setLastLoadedItem] = useState<HistoryItem | null>(null);
+  const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
+
+  // Restore auto-saved state on startup if available
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('padgen_autosave_state');
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (parsed.companyData) setCompanyData(parsed.companyData);
+        if (typeof parsed.themeIdx === 'number') setThemeIdx(parsed.themeIdx);
+        if (parsed.controls) setControls(parsed.controls);
+        if (parsed.uploadedLogo) setUploadedLogo(parsed.uploadedLogo);
+      }
+    } catch (err) {
+      console.warn('Failed to restore auto-saved state from localStorage:', err);
+    }
+  }, []);
+
+  // 30-second Auto-save interval
+  useEffect(() => {
+    const saveCurrentState = () => {
+      try {
+        const payload = {
+          companyData,
+          themeIdx,
+          controls,
+          uploadedLogo,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem('padgen_autosave_state', JSON.stringify(payload));
+        const formattedTime = new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+        setLastSavedTime(formattedTime);
+      } catch (e) {
+        console.warn('Auto-save error:', e);
+      }
+    };
+
+    saveCurrentState();
+    const interval = setInterval(saveCurrentState, 30000); // 30 seconds
+    return () => clearInterval(interval);
+  }, [companyData, themeIdx, controls, uploadedLogo]);
 
   // DOM Refs for image rendering
   const previewPadRef = useRef<HTMLDivElement | null>(null);
@@ -499,7 +544,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white text-neutral-800 transition-colors duration-200">
       {/* Top Navigation Header */}
-      <HeaderNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <HeaderNavigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        lastSavedTime={lastSavedTime}
+      />
 
       {/* Main Workspace Area */}
       <main className="w-full px-2 sm:px-4 md:px-6 py-1 print:py-0">

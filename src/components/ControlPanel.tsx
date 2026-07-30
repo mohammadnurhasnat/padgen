@@ -101,6 +101,42 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onUploadedLogoOpacityChange,
 }) => {
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const [isSmartFilling, setIsSmartFilling] = React.useState(false);
+
+  const handleSmartFill = async () => {
+    if (!companyData.companyName) {
+      alert('Please enter a Company Name first to use Smart Fill.');
+      return;
+    }
+    try {
+      setIsSmartFilling(true);
+      const res = await fetch('/api/smart-fill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: companyData.companyName,
+          industry: companyData.industry || 'Corporate',
+          applicantName: companyData.empName || 'Md. Rahim Uddin',
+          designation: companyData.empRole || 'Senior Executive'
+        }),
+      });
+      if (!res.ok) throw new Error('Smart fill API failed');
+      const data = await res.json();
+      onDataChange({
+        ...companyData,
+        tagline: data.tagline || companyData.tagline,
+        address: data.address || companyData.address,
+        phone: data.phone || companyData.phone,
+        email: data.email || companyData.email,
+        empName: data.empName || companyData.empName,
+        empRole: data.empRole || companyData.empRole,
+      });
+    } catch (err) {
+      console.error('Smart Fill error:', err);
+    } finally {
+      setIsSmartFilling(false);
+    }
+  };
 
   const handleInputChange = (field: keyof CompanyData, value: string) => {
     onDataChange({
@@ -172,8 +208,20 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       <div className="flex-grow flex-1 overflow-y-auto p-5 md:p-8 flex flex-col gap-6 bg-white">
         {/* Company Fields */}
         <div className="flex flex-col gap-4">
-          <div className="text-[11px] font-mono text-[var(--ui-accent)] uppercase tracking-wider font-bold border-b border-[#DDDEDC] pb-1.5">
-            Company Credentials
+          <div className="flex items-center justify-between border-b border-[#DDDEDC] pb-1.5">
+            <div className="text-[11px] font-mono text-[var(--ui-accent)] uppercase tracking-wider font-bold">
+              Company Credentials
+            </div>
+            <button
+              type="button"
+              onClick={handleSmartFill}
+              disabled={isSmartFilling}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-50"
+              title="Use Gemini AI to intelligently fill company details"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{isSmartFilling ? 'Generating...' : 'Smart Fill AI'}</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -83,7 +83,7 @@ Choose the layout formats wisely:
 - textCasing: one of 'title', 'upper', 'lower'`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.6-flash",
       contents: prompt,
       config: {
         systemInstruction,
@@ -171,6 +171,81 @@ Choose the layout formats wisely:
   } catch (error: any) {
     console.error("AI Generation Error:", error);
     res.status(500).json({ error: error?.message || "Failed to generate premium design using Gemini AI." });
+  }
+});
+
+// API route for Smart Fill - generates professional NOC & Cover Letter content
+app.post("/api/smart-fill", async (req, res) => {
+  try {
+    const { companyName, industry, applicantName, designation, nocCategory, visaCategory } = req.body;
+
+    if (!companyName) {
+      return res.status(400).json({ error: "Company name is required for Smart Fill." });
+    }
+
+    const ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+
+    const prompt = `Generate realistic, professional company branding and document copy for:
+Company Name: ${companyName}
+Industry: ${industry || 'Corporate Services'}
+Applicant Name: ${applicantName || 'Md. Rahim Uddin'}
+Designation: ${designation || 'Senior Executive'}
+NOC Category: ${nocCategory || 'Tourist'}
+Visa Category: ${visaCategory || 'Tourist Visa'}`;
+
+    const systemInstruction = `You are an expert HR manager and legal document advisor.
+Return a JSON object containing complete, highly professional company information, NOC letter draft, and Cover letter draft in English.
+Make sure all details are complete, realistic, and polished.
+
+JSON Structure required:
+- tagline: a sleek corporate tagline or slogan (string)
+- address: realistic full business address in Bangladesh/South Asia or global (string)
+- phone: realistic telephone line (string)
+- email: realistic corporate email address (string)
+- empName: applicant's full name (string)
+- empRole: applicant's official designation (string)
+- nocContent: full formal No Objection Certificate (NOC) text ready for letterhead printing (string)
+- coverLetterContent: full formal Visa Application Cover Letter text addressed to the Embassy/High Commission (string)`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            tagline: { type: Type.STRING },
+            address: { type: Type.STRING },
+            phone: { type: Type.STRING },
+            email: { type: Type.STRING },
+            empName: { type: Type.STRING },
+            empRole: { type: Type.STRING },
+            nocContent: { type: Type.STRING },
+            coverLetterContent: { type: Type.STRING }
+          },
+          required: ["tagline", "address", "phone", "email", "empName", "empRole", "nocContent", "coverLetterContent"]
+        }
+      }
+    });
+
+    const text = response.text;
+    if (!text) {
+      throw new Error("No response from Gemini.");
+    }
+    const result = JSON.parse(text);
+    res.json(result);
+  } catch (error: any) {
+    console.error("Smart Fill AI Error:", error);
+    res.status(500).json({ error: error?.message || "Failed to generate smart fill content." });
   }
 });
 

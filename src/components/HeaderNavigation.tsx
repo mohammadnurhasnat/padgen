@@ -6,6 +6,7 @@ interface HeaderNavigationProps {
   onTabChange: (tab: 'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal') => void;
   onOpenHistory?: () => void;
   historyCount?: number;
+  lastSavedTime?: string | null;
 }
 
 export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
@@ -13,6 +14,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   onTabChange,
   onOpenHistory,
   historyCount = 0,
+  lastSavedTime,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
@@ -56,9 +58,17 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-neutral-900 m-0 leading-none">
-                PadGen
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-neutral-900 m-0 leading-none">
+                  PadGen
+                </h1>
+                {lastSavedTime && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full" title={`Auto-saved to browser at ${lastSavedTime}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Saved {lastSavedTime}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
