@@ -25,14 +25,12 @@ import { JobIDCard } from './components/JobIDCard';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { CoverLetterGenerator } from './components/CoverLetterGenerator';
 import { NOCGenerator } from './components/NOCGenerator';
-import { DigitalSealGenerator } from './components/DigitalSealGenerator';
 import { svgWrap, downloadBlob } from './utils';
 
 export default function App() {
-  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal'
-  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal'>('designer');
+  // Navigation / Workspace tab state: 'designer' | 'cover-letter' | 'id-card' | 'noc'
+  const [activeTab, setActiveTab] = useState<'designer' | 'cover-letter' | 'id-card' | 'noc'>('designer');
   const [designerStep, setDesignerStep] = useState<'form' | 'preview'>('form');
-  const [attachedSealImage, setAttachedSealImage] = useState<string | null>(null);
 
   // ------------------------------------------
   // Pad & Card Designer State
@@ -71,6 +69,7 @@ export default function App() {
   const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [lastLoadedItem, setLastLoadedItem] = useState<HistoryItem | null>(null);
+  const [templateLoadKey, setTemplateLoadKey] = useState<number>(1);
   const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
 
   // Restore auto-saved state on startup if available
@@ -276,6 +275,7 @@ export default function App() {
   };
 
   const handleResetInputs = () => {
+    setTemplateLoadKey(prev => prev + 1);
     setCompanyData(DEFAULT_COMPANY_DATA);
     setStatus('Company details reset to default.');
     setTimeout(() => setStatus(null), 3000);
@@ -448,6 +448,7 @@ export default function App() {
 
   const handleLoadLocalTemplate = (payload: any) => {
     if (payload && payload.data) {
+      setTemplateLoadKey(prev => prev + 1);
       setCompanyData(payload.data);
       if (payload.theme) {
         const idx = THEMES.findIndex(t => t.name === payload.theme.name);
@@ -494,6 +495,7 @@ export default function App() {
 
   const handleLoadHistoryItem = (item: HistoryItem) => {
     setLastLoadedItem(item);
+    setTemplateLoadKey(prev => prev + 1);
     if (item.data) {
       setCompanyData(item.data);
     }
@@ -589,6 +591,11 @@ export default function App() {
                 onUploadedLogoSizeChange={setUploadedLogoSize}
                 uploadedLogoOpacity={uploadedLogoOpacity}
                 onUploadedLogoOpacityChange={setUploadedLogoOpacity}
+                templateLoadKey={templateLoadKey}
+                lastLoadedItem={lastLoadedItem}
+                themeIdx={themeIdx}
+                onThemeChange={setThemeIdx}
+                onPreviewClick={() => setDesignerStep('preview')}
               />
             </div>
             <div className={`${designerStep === 'preview' ? 'flex' : 'hidden'} lg:flex w-full lg:flex-1 h-full overflow-hidden rounded-xl`}>
@@ -667,26 +674,6 @@ export default function App() {
               onOpenHistory={() => setIsHistoryOpen(true)}
               historyCount={historyList.length}
               lastLoadedItem={lastLoadedItem}
-              externalSealImage={attachedSealImage}
-            />
-          </motion.div>
-        </div>
-
-        {/* TAB 5: Digital Seal Generator */}
-        <div className={activeTab === 'seal' ? 'block' : 'hidden'}>
-          <motion.div
-            key="seal-view"
-            animate={activeTab === 'seal' ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-            transition={{ duration: 0.15 }}
-          >
-            <DigitalSealGenerator
-              companyData={companyData}
-              onOpenHistory={() => setIsHistoryOpen(true)}
-              historyCount={historyList.length}
-              onApplyToNOC={(sealUrl) => {
-                setAttachedSealImage(sealUrl);
-                setActiveTab('noc');
-              }}
             />
           </motion.div>
         </div>

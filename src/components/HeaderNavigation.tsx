@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Layers, History } from 'lucide-react';
 
 interface HeaderNavigationProps {
-  activeTab: 'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal';
-  onTabChange: (tab: 'designer' | 'cover-letter' | 'id-card' | 'noc' | 'seal') => void;
+  activeTab: 'designer' | 'cover-letter' | 'id-card' | 'noc';
+  onTabChange: (tab: 'designer' | 'cover-letter' | 'id-card' | 'noc') => void;
   onOpenHistory?: () => void;
   historyCount?: number;
   lastSavedTime?: string | null;
@@ -116,8 +116,8 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                 </button>
               </div>
 
-              {/* Row 2 on Mobile: Job ID, Seal, NOC */}
-              <div className="grid grid-cols-3 sm:flex items-center gap-1.5 w-full sm:w-auto">
+              {/* Row 2 on Mobile: Job ID, NOC */}
+              <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
                 <button
                   onClick={() => onTabChange('id-card')}
                   className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
@@ -127,16 +127,6 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                   }`}
                 >
                   Job ID
-                </button>
-                <button
-                  onClick={() => onTabChange('seal')}
-                  className={`w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-1.5 rounded-[10px] text-xs text-center transition-all duration-150 cursor-pointer ${
-                    activeTab === 'seal'
-                      ? 'bg-purple-600 text-white border-b-4 border-black/30 shadow-md font-black ring-2 ring-purple-400 ring-offset-1'
-                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 font-semibold'
-                  }`}
-                >
-                  Seal
                 </button>
                 <button
                   onClick={() => onTabChange('noc')}
